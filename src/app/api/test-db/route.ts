@@ -3,12 +3,12 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
-    // Try to connect and query
+    // Try to connect and query - testing connection
     const result = await prisma.$queryRaw`SELECT 1 as test`;
     
     return NextResponse.json({ 
       success: true, 
-      message: 'Database connection successful',
+      message: 'Database connection successful!',
       result 
     });
   } catch (error: any) {

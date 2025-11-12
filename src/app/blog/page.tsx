@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { Calendar, User, ArrowRight, ExternalLink } from 'lucide-react';
+import { Calendar, User, ArrowRight, ExternalLink, RefreshCw } from 'lucide-react';
 
 interface BlogPost {
   id: string;
@@ -18,11 +19,13 @@ interface BlogPost {
 }
 
 export default function BlogPage() {
+  const { data: session } = useSession();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     fetchPosts();
@@ -55,6 +58,27 @@ export default function BlogPage() {
     }
   };
 
+  const syncFeeds = async () => {
+    setSyncing(true);
+    try {
+      const response = await fetch('/api/blog/sync', {
+        method: 'POST',
+      });
+      if (response.ok) {
+        const result = await response.json();
+        alert(`Success! Added ${result.totalAdded} new posts from RSS feeds.`);
+        fetchPosts(); // Refresh the posts
+      } else {
+        alert('Failed to sync feeds. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error syncing feeds:', error);
+      alert('Error syncing feeds.');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -77,6 +101,16 @@ export default function BlogPage() {
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Real stories of hope, generosity, and faith-based news from around the world
           </p>
+          {session?.user?.userType === 'ADMIN' && (
+            <button
+              onClick={syncFeeds}
+              disabled={syncing}
+              className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-xl font-semibold hover:scale-105 transition-all disabled:opacity-50"
+            >
+              <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
+              {syncing ? 'Syncing...' : 'Sync RSS Feeds'}
+            </button>
+          )}
         </div>
 
         {/* Category Filter */}

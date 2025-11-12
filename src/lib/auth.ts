@@ -1,11 +1,16 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import GitHubProvider from 'next-auth/providers/github';
 import { prisma } from './prisma';
 import bcrypt from 'bcryptjs';
 import { UserType } from '@prisma/client';
 
 export const authOptions: NextAuthOptions = {
   providers: [
+    GitHubProvider({
+      clientId: process.env.GITHUB_ID || '',
+      clientSecret: process.env.GITHUB_SECRET || '',
+    }),
     CredentialsProvider({
       name: 'credentials',
       credentials: {
@@ -45,10 +50,39 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account, profile }) {
+      // Handle GitHub OAuth sign-in
+      if (account?.provider === 'github') {
+        const email = user.email;
+        if (!email) return false;
+
+        // Check if user exists
+        let dbUser = await prisma.user.findUnique({
+          where: { email },
+        });
+
+        // Create user if doesn't exist
+        if (!dbUser) {
+          dbUser = await prisma.user.create({
+            data: {
+              email,
+              fullName: user.name || 'GitHub User',
+              userType: 'DONOR', // Default to DONOR for GitHub sign-ins
+              image: user.image,
+            },
+          });
+        }
+
+        // Store the database user ID in the account
+        user.id = dbUser.id;
+        (user as any).userType = dbUser.userType;
+      }
+      return true;
+    },
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
-        token.userType = user.userType;
+        token.userType = (user as any).userType;
       } else if (token.id) {
         // Refresh user data from database to get latest userType
         const dbUser = await prisma.user.findUnique({
@@ -64,7 +98,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.userType = token.userType as UserType;
+        session.user.userType = token.userType as any;
       }
       return session;
     },

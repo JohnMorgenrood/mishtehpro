@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { LogIn, Eye, EyeOff } from 'lucide-react';
+import { LogIn, Eye, EyeOff, Github } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -15,6 +15,11 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const handleGitHubSignIn = async () => {
+    setIsLoading(true);
+    await signIn('github', { callbackUrl: '/dashboard' });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,6 +132,25 @@ export default function LoginPage() {
             className="w-full px-6 py-3 bg-primary-600 text-white font-semibold rounded-md hover:bg-primary-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
           >
             {isLoading ? 'Signing In...' : 'Sign In'}
+          </button>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-gray-50 text-gray-500">Or continue with</span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleGitHubSignIn}
+            disabled={isLoading}
+            className="w-full px-6 py-3 bg-gray-900 text-white font-semibold rounded-md hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+          >
+            <Github className="w-5 h-5" />
+            Sign in with GitHub
           </button>
 
           <div className="text-center text-sm">

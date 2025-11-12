@@ -23,6 +23,20 @@ export default function NewRequestPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Validate required fields
+    if (!formData.title || !formData.description || !formData.location) {
+      setError('Please fill in all required fields (Title, Description, and Location)');
+      return;
+    }
+
+    // Check if user is logged in
+    if (!session?.user) {
+      setError('You must be logged in to create a request');
+      router.push('/auth/login');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {

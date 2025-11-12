@@ -6,19 +6,37 @@ import Parser from 'rss-parser';
 
 const parser = new Parser();
 
-// Christian news RSS feeds
+// RSS feeds for Christian news and humanitarian work
 const RSS_FEEDS = [
   {
     url: 'https://www.christianitytoday.com/ct/rss/index.rss',
     category: 'Christian News',
+    maxItems: 3,
   },
   {
     url: 'https://www1.cbn.com/rss-cbn-articles-cbnnews.xml',
     category: 'Faith & Culture',
+    maxItems: 3,
   },
   {
     url: 'https://www.jpost.com/rss/rssfeedsheadlines.aspx',
     category: 'Israel News',
+    maxItems: 3,
+  },
+  {
+    url: 'https://www.worldvision.org/about-us/media-center/press-releases?format=feed&type=rss',
+    category: 'World News',
+    maxItems: 4,
+  },
+  {
+    url: 'https://reliefweb.int/updates/rss.xml',
+    category: 'World News',
+    maxItems: 4,
+  },
+  {
+    url: 'https://www.unicef.org/press-releases/rss.xml',
+    category: 'World News',
+    maxItems: 3,
   },
 ];
 
@@ -36,11 +54,24 @@ export async function POST() {
 
     let totalAdded = 0;
 
+    // First, delete old external posts (keep only last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    await prisma.blogPost.deleteMany({
+      where: {
+        isExternal: true,
+        publishedAt: {
+          lt: thirtyDaysAgo,
+        },
+      },
+    });
+
     for (const feed of RSS_FEEDS) {
       try {
         const feedData = await parser.parseURL(feed.url);
         
-        for (const item of feedData.items.slice(0, 5)) { // Get latest 5 from each feed
+        for (const item of feedData.items.slice(0, feed.maxItems)) {
           if (!item.title || !item.link) continue;
 
           const slug = item.title

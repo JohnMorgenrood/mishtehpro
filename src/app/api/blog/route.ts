@@ -5,7 +5,7 @@ export async function GET() {
   try {
     const posts = await prisma.blogPost.findMany({
       orderBy: { publishedAt: 'desc' },
-      take: 50,
+      take: 30, // Limit to 30 latest posts to keep site fast
     });
 
     return NextResponse.json(posts);

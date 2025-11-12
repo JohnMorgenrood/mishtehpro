@@ -104,13 +104,19 @@ export async function POST() {
             }
 
             // Clean up excerpt - remove ALL HTML tags, schema markup, and excess whitespace
-            const cleanExcerpt = (item.contentSnippet || item.content || '')
+            let cleanExcerpt = (item.contentSnippet || item.content || item.title || '')
               .replace(/<span[^>]*>.*?<\/span>/gi, '') // Remove span tags with content
               .replace(/<[^>]*>/g, '') // Remove all HTML tags
-              .replace(/&[a-z]+;/gi, '') // Remove HTML entities
+              .replace(/&[#a-z0-9]+;/gi, '') // Remove HTML entities like &#039;
               .replace(/\s+/g, ' ') // Normalize whitespace
-              .trim()
-              .substring(0, 300);
+              .trim();
+            
+            // If excerpt is too short or still has junk, use just the title
+            if (cleanExcerpt.length < 20 || cleanExcerpt.includes('property=') || cleanExcerpt.includes('resource=')) {
+              cleanExcerpt = item.title.substring(0, 300);
+            } else {
+              cleanExcerpt = cleanExcerpt.substring(0, 300);
+            }
 
             await prisma.blogPost.create({
               data: {

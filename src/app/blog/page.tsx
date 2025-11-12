@@ -151,38 +151,51 @@ export default function BlogPage() {
               {internalPosts.map((post) => (
                 <article
                   key={post.id}
-                  className="bg-white rounded-2xl shadow-soft p-6 hover:shadow-soft-lg transition-all hover:scale-105 border border-gray-100"
+                  className="bg-white rounded-2xl shadow-soft overflow-hidden hover:shadow-soft-lg transition-all hover:scale-105"
                 >
-                  {/* Category Badge with gradient */}
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="inline-block px-4 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white text-xs font-semibold rounded-full">
+                  {/* Beautiful Image Header */}
+                  {post.imageUrl && (
+                    <div className="h-56 relative overflow-hidden">
+                      <img
+                        src={post.imageUrl}
+                        alt={post.title}
+                        className="w-full h-full object-cover transition-transform hover:scale-110 duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                    </div>
+                  )}
+                  
+                  {/* Content */}
+                  <div className="p-6">
+                    {/* Category Badge with gradient */}
+                    <span className="inline-block px-4 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white text-xs font-semibold rounded-full mb-4">
                       {post.category}
                     </span>
-                  </div>
-                  
-                  <h2 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
-                    {post.title}
-                  </h2>
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                    {post.excerpt}
-                  </p>
-                  <div className="flex items-center justify-between text-sm text-gray-500 mb-4 pt-4 border-t border-gray-100">
-                    <div className="flex items-center gap-2">
-                      <User className="w-4 h-4" />
-                      <span className="text-xs">{post.author}</span>
+                    
+                    <h2 className="text-2xl font-bold text-gray-900 mb-3 line-clamp-2 hover:text-primary-600 transition-colors">
+                      {post.title}
+                    </h2>
+                    <p className="text-gray-600 text-base mb-6 line-clamp-3 leading-relaxed">
+                      {post.excerpt}
+                    </p>
+                    <div className="flex items-center justify-between text-sm text-gray-500 mb-6 pt-4 border-t border-gray-100">
+                      <div className="flex items-center gap-2">
+                        <User className="w-4 h-4 text-primary-600" />
+                        <span className="font-medium">{post.author}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-primary-600" />
+                        <span>{new Date(post.publishedAt).toLocaleDateString()}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
-                      <span className="text-xs">{new Date(post.publishedAt).toLocaleDateString()}</span>
-                    </div>
+                    <Link
+                      href={`/blog/${post.slug}`}
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-600 to-secondary-600 text-white font-semibold rounded-xl hover:scale-105 transition-all shadow-md"
+                    >
+                      Read More
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
                   </div>
-                  <Link
-                    href={`/blog/${post.slug}`}
-                    className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-semibold transition-colors text-sm"
-                  >
-                    Read More
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
                 </article>
               ))}
             </div>

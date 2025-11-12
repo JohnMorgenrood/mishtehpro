@@ -50,6 +50,22 @@ enum DonationStatus {
   REFUNDED
 }
 
+enum TransactionStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+enum TransactionType {
+  DONATION
+  DISBURSEMENT
+  REFUND
+  FEE
+}
+
 enum DocumentStatus {
   PENDING
   VERIFIED
@@ -217,3 +233,54 @@ model BlogPost {
   @@index([slug])
 }
 
+// Transaction model - comprehensive financial transaction tracking
+model Transaction {
+  id                String            @id @default(cuid())
+  
+  // Transaction details
+  type              TransactionType
+  status            TransactionStatus @default(PENDING)
+  amount            Float             // Gross amount
+  feeAmount         Float             @default(0) // Platform fee (R2 + %)
+  netAmount         Float             // Amount after fees
+  currency          String            @default("ZAR")
+  
+  // PayPal/Payment gateway details
+  paymentGateway    String?           // "PayPal", "Stripe", etc.
+  paymentId         String?           // External payment ID
+  payerId           String?           // Payer ID from gateway
+  paymentIntentId   String?           // Payment intent ID
+  gatewayResponse   String?           @db.Text // JSON response from gateway
+  gatewayFee        Float?            // Fee charged by payment gateway
+  
+  // User relationships
+  donorId           String?           // User who made donation
+  donorName         String?           // Cached donor name
+  donorEmail        String?           // Cached donor email
+  recipientId       String?           // User receiving funds
+  recipientName     String?           // Cached recipient name
+  recipientEmail    String?           // Cached recipient email
+  
+  // Request relationship
+  requestId         String?           // Associated request
+  requestTitle      String?           // Cached request title
+  
+  // Admin controls
+  approvedBy        String?           // Admin user ID who approved
+  approvedAt        DateTime?
+  failureReason     String?           @db.Text
+  adminNotes        String?           @db.Text
+  
+  // Timestamps
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  completedAt       DateTime?
+  
+  @@index([type])
+  @@index([status])
+  @@index([donorId])
+  @@index([recipientId])
+  @@index([requestId])
+  @@index([createdAt(sort: Desc)])
+  @@index([paymentId])
+}

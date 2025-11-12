@@ -80,7 +80,7 @@ export default function BlogPage() {
         // Refresh posts immediately
         await fetchPosts();
         
-        alert(`Success! Processed ${result.totalProcessed} articles.\nAdded ${result.totalAdded} new posts.\nDeleted ${result.deletedOld} old posts.\n\nDetails:\n${result.feedResults.map((f: any) => `${f.category}: ${f.added || 0} added${f.error ? ' (ERROR)' : ''}`).join('\n')}`);
+        alert(`Success! Processed ${result.totalProcessed || 0} articles.\nAdded ${result.totalAdded || 0} new posts.\nDeleted ${result.deletedOld || 0} old posts.`);
       } else {
         alert(`Failed to sync feeds: ${result.error || 'Unknown error'}`);
       }

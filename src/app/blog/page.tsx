@@ -44,7 +44,8 @@ export default function BlogPage() {
         setPosts(data);
         
         // Extract unique categories
-        const uniqueCategories = ['All', ...new Set(data.map((post: BlogPost) => post.category))];
+        const categorySet = new Set(data.map((post: BlogPost) => post.category));
+        const uniqueCategories: string[] = ['All', ...Array.from(categorySet)];
         setCategories(uniqueCategories);
       }
     } catch (error) {

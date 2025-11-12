@@ -9,39 +9,46 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Background color - warm beige from logo
-        background: '#d4c4a3',
-        // Primary accent - dark teal from logo (SWAPPED)
+        // Background color - soft pearl/cream
+        background: '#f5f0e8',
+        // Primary accent - Rich rose gold/copper (feminine & elegant)
         primary: {
-          50: '#e8eef0',
-          100: '#d1dde1',
-          200: '#a3bbc3',
-          300: '#7599a5',
-          400: '#477787',
-          500: '#195569',
-          600: '#144454',
-          700: '#0f333f',
-          800: '#0a222a',
-          900: '#051115',
-          DEFAULT: '#0e1f29', // Main accent - dark teal/blue
+          50: '#fdf6f3',
+          100: '#fae8e1',
+          200: '#f5d1c3',
+          300: '#efb5a0',
+          400: '#e89277',
+          500: '#d97454',
+          600: '#c85d40',
+          700: '#b04a36',
+          800: '#923e31',
+          900: '#79362c',
+          DEFAULT: '#c85d40', // Rose gold/warm copper
         },
-        // Secondary accent - gold/tan from logo (SWAPPED)
+        // Secondary accent - Deep teal with purple undertones (mystical & feminine)
         secondary: {
-          50: '#fdf8f3',
-          100: '#faf0e6',
-          200: '#f5ddc4',
-          300: '#efc49f',
-          400: '#e3a46d',
-          500: '#d68a4c',
-          600: '#c67540',
-          700: '#a76238',
-          800: '#865035',
-          900: '#6d432e',
-          DEFAULT: '#a16238', // Gold/tan accent
+          50: '#f0f7f9',
+          100: '#dceef3',
+          200: '#bddde7',
+          300: '#8ec4d5',
+          400: '#5aa3bc',
+          500: '#3d87a1',
+          600: '#346d87',
+          700: '#2f5a6f',
+          800: '#2d4d5c',
+          900: '#29414e',
+          DEFAULT: '#2f5a6f', // Mystical teal
+        },
+        // Accent colors
+        accent: {
+          gold: '#d4af37',      // Rich gold
+          rose: '#e8a5a5',      // Soft rose
+          lavender: '#c8b8d8',  // Gentle lavender
+          sage: '#a8b5a0',      // Soft sage green
         },
       },
       backgroundColor: {
-        'page': '#d4c4a3', // Default page background
+        'page': '#f5f0e8', // Soft pearl background
       },
     },
   },

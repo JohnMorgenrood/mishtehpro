@@ -4,7 +4,7 @@
 
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-rgb: 212, 196, 163; /* #d4c4a3 - warm beige from logo */
+  --background-rgb: 245, 240, 232; /* #f5f0e8 - soft pearl/cream */
 }
 
 body {
@@ -12,22 +12,22 @@ body {
   background: rgb(var(--background-rgb));
 }
 
-/* Custom scrollbar - matching theme colors */
+/* Custom scrollbar - elegant rose gold theme */
 ::-webkit-scrollbar {
   width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #e8dcc8;
+  background: #fae8e1;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #0e1f29;
+  background: #c85d40;
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #0a171d;
+  background: #b04a36;
 }
 
 /* Line clamp utilities */

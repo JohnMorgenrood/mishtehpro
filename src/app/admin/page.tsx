@@ -38,6 +38,23 @@ async function getPendingRequests() {
   });
 }
 
+async function getActiveRequests() {
+  return await prisma.request.findMany({
+    where: { status: 'ACTIVE' },
+    include: {
+      user: {
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+        },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 10,
+  });
+}
+
 async function getPendingDocuments() {
   return await prisma.document.findMany({
     where: { status: 'PENDING' },
@@ -69,6 +86,7 @@ export default async function AdminDashboard() {
 
   const stats = await getAdminStats();
   const pendingRequests = await getPendingRequests();
+  const activeRequests = await getActiveRequests();
   const pendingDocuments = await getPendingDocuments();
 
   return (
@@ -144,6 +162,60 @@ export default async function AdminDashboard() {
             ) : (
               <p className="text-center text-gray-600 py-8">
                 No pending requests to review
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Active Requests - For Featured Toggle */}
+        <div className="bg-white rounded-lg shadow-md mb-8">
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-xl font-bold text-gray-900">
+              Active Requests ({activeRequests.length})
+            </h2>
+            <p className="text-sm text-gray-600 mt-1">
+              Click to manage featured status
+            </p>
+          </div>
+          <div className="p-6">
+            {activeRequests.length > 0 ? (
+              <div className="space-y-4">
+                {activeRequests.map((request: any) => (
+                  <div key={request.id} className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            {request.title}
+                          </h3>
+                          {request.featured && (
+                            <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded">
+                              ⭐ Featured
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-500 mt-1">
+                          By {request.user.fullName} ({request.user.email})
+                        </p>
+                        <p className="text-sm text-gray-600 mt-2">
+                          {request.category} • {request.urgency} • {request.location}
+                        </p>
+                      </div>
+                      <div className="ml-4 flex gap-2">
+                        <Link
+                          href={`/admin/requests/${request.id}`}
+                          className="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-md hover:bg-primary-700"
+                        >
+                          Manage
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-gray-600 py-8">
+                No active requests
               </p>
             )}
           </div>

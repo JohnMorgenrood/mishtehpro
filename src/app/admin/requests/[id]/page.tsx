@@ -16,6 +16,8 @@ interface Request {
   targetAmount: number;
   currentAmount: number;
   status: string;
+  featured: boolean;
+  isAnonymous: boolean;
   createdAt: string;
   user: {
     fullName: string;
@@ -78,6 +80,31 @@ export default function AdminRequestReview({ params }: { params: { id: string } 
       }
     } catch (error) {
       console.error('Error updating request:', error);
+      alert('An error occurred');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleToggleFeatured = async () => {
+    setProcessing(true);
+
+    try {
+      const response = await fetch(`/api/admin/requests/${params.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ featured: !request?.featured }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setRequest(data.request);
+        alert(`Request ${data.request.featured ? 'featured' : 'unfeatured'} successfully!`);
+      } else {
+        alert('Failed to update request');
+      }
+    } catch (error) {
+      console.error('Error toggling featured:', error);
       alert('An error occurred');
     } finally {
       setProcessing(false);
@@ -183,6 +210,30 @@ export default function AdminRequestReview({ params }: { params: { id: string } 
                 )}
               </div>
             </div>
+
+            {/* Featured Toggle */}
+            {request.status === 'ACTIVE' && (
+              <div className="border-t pt-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Featured Settings</h3>
+                <div className="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
+                  <div>
+                    <p className="font-medium text-gray-900">Featured on Homepage</p>
+                    <p className="text-sm text-gray-600">Display this request prominently on the homepage</p>
+                  </div>
+                  <button
+                    onClick={handleToggleFeatured}
+                    disabled={processing}
+                    className={`px-6 py-2 font-medium rounded-md transition-colors ${
+                      request.featured
+                        ? 'bg-yellow-600 text-white hover:bg-yellow-700'
+                        : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    {request.featured ? '⭐ Featured' : 'Not Featured'}
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Action Buttons */}
             {request.status === 'PENDING' && (

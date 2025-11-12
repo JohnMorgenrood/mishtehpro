@@ -8,6 +8,7 @@ async function getFeaturedRequests() {
     const requests = await prisma.request.findMany({
       where: {
         status: { in: ['ACTIVE', 'PARTIALLY_FUNDED'] },
+        featured: true,
       },
       include: {
         user: {

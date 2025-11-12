@@ -19,21 +19,29 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const { status } = body;
+    const { status, featured } = body;
 
-    if (!['ACTIVE', 'REJECTED'].includes(status)) {
-      return NextResponse.json(
-        { error: 'Invalid status' },
-        { status: 400 }
-      );
+    // Prepare update data
+    const updateData: any = {};
+
+    if (status !== undefined) {
+      if (!['ACTIVE', 'REJECTED'].includes(status)) {
+        return NextResponse.json(
+          { error: 'Invalid status' },
+          { status: 400 }
+        );
+      }
+      updateData.status = status;
+      updateData.verified = status === 'ACTIVE';
+    }
+
+    if (featured !== undefined) {
+      updateData.featured = featured;
     }
 
     const helpRequest = await prisma.request.update({
       where: { id: params.id },
-      data: {
-        status,
-        verified: status === 'ACTIVE',
-      },
+      data: updateData,
     });
 
     return NextResponse.json({

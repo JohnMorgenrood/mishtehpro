@@ -131,14 +131,18 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200">
+        {/* Mobile Navigation with Dropdown Animation */}
+        <div
+          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+            mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+          }`}
+        >
+          <div className="py-4 border-t border-gray-200">
             <div className="flex flex-col gap-3">
               <Link
                 href="/"
-                className={`px-4 py-2 text-sm font-medium rounded-md ${
-                  isActive('/') ? 'bg-primary-50 text-primary-600' : 'text-gray-700'
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  isActive('/') ? 'bg-primary-50 text-primary-600' : 'text-gray-700 hover:bg-gray-50'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -146,8 +150,8 @@ export default function Navbar() {
               </Link>
               <Link
                 href="/requests"
-                className={`px-4 py-2 text-sm font-medium rounded-md ${
-                  isActive('/requests') ? 'bg-primary-50 text-primary-600' : 'text-gray-700'
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  isActive('/requests') ? 'bg-primary-50 text-primary-600' : 'text-gray-700 hover:bg-gray-50'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -155,8 +159,8 @@ export default function Navbar() {
               </Link>
               <Link
                 href="/blog"
-                className={`px-4 py-2 text-sm font-medium rounded-md ${
-                  isActive('/blog') ? 'bg-primary-50 text-primary-600' : 'text-gray-700'
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  isActive('/blog') ? 'bg-primary-50 text-primary-600' : 'text-gray-700 hover:bg-gray-50'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -164,8 +168,8 @@ export default function Navbar() {
               </Link>
               <Link
                 href="/about"
-                className={`px-4 py-2 text-sm font-medium rounded-md ${
-                  isActive('/about') ? 'bg-primary-50 text-primary-600' : 'text-gray-700'
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  isActive('/about') ? 'bg-primary-50 text-primary-600' : 'text-gray-700 hover:bg-gray-50'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -173,8 +177,8 @@ export default function Navbar() {
               </Link>
               <Link
                 href="/contact"
-                className={`px-4 py-2 text-sm font-medium rounded-md ${
-                  isActive('/contact') ? 'bg-primary-50 text-primary-600' : 'text-gray-700'
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  isActive('/contact') ? 'bg-primary-50 text-primary-600' : 'text-gray-700 hover:bg-gray-50'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -185,38 +189,38 @@ export default function Navbar() {
                 <>
                   <Link
                     href="/dashboard"
-                    className={`px-4 py-2 text-sm font-medium rounded-md ${
-                      isActive('/dashboard') ? 'bg-primary-50 text-primary-600' : 'text-gray-700'
+                    className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                      isActive('/dashboard') ? 'bg-primary-50 text-primary-600' : 'text-gray-700 hover:bg-gray-50'
                     }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Dashboard
                   </Link>
-                  <div className="px-4 py-2 border-t border-gray-200">
-                    <p className="text-sm text-gray-600 mb-2">{session.user.name}</p>
+                  <div className="px-4 py-2 mt-2 border-t border-gray-200">
+                    <p className="text-sm text-gray-600 mb-2 font-medium">{session.user.name}</p>
                     <button
                       onClick={() => {
                         handleSignOut();
                         setMobileMenuOpen(false);
                       }}
-                      className="w-full px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+                      className="w-full px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-500 to-pink-500 rounded-lg hover:from-red-600 hover:to-pink-600 transition-all"
                     >
                       Sign Out
                     </button>
                   </div>
                 </>
               ) : (
-                <div className="px-4 py-2 border-t border-gray-200 flex flex-col gap-2">
+                <div className="px-4 py-2 mt-2 border-t border-gray-200 flex flex-col gap-2">
                   <Link
                     href="/auth/login"
-                    className="w-full px-4 py-2 text-sm font-medium text-center text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+                    className="w-full px-4 py-2 text-sm font-medium text-center text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Login
                   </Link>
                   <Link
                     href="/auth/register"
-                    className="w-full px-4 py-2 text-sm font-medium text-center text-white bg-primary-600 rounded-md hover:bg-primary-700"
+                    className="w-full px-4 py-2 text-sm font-semibold text-center text-white bg-gradient-to-r from-primary-600 to-secondary-600 rounded-lg shadow-soft hover:shadow-soft-lg transition-all"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Register
@@ -225,7 +229,7 @@ export default function Navbar() {
               )}
             </div>
           </div>
-        )}
+        </div>
       </div>
     </nav>
   );

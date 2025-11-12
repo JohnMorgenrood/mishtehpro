@@ -12,6 +12,7 @@ const createRequestSchema = z.object({
   urgency: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']),
   location: z.string().min(2, 'Location is required'),
   targetAmount: z.number().positive().optional(),
+  isAnonymous: z.boolean().optional(),
   expiresAt: z.string().optional(),
 });
 
@@ -130,6 +131,7 @@ export async function POST(request: NextRequest) {
         urgency: data.urgency,
         location: data.location,
         targetAmount: data.targetAmount,
+        isAnonymous: data.isAnonymous || false,
         expiresAt: data.expiresAt ? new Date(data.expiresAt) : undefined,
         status: 'PENDING', // Starts as pending until verified
       },

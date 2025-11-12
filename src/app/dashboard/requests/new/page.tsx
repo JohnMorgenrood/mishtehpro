@@ -15,6 +15,7 @@ export default function NewRequestPage() {
     urgency: 'MEDIUM',
     location: '',
     targetAmount: '',
+    isAnonymous: false,
   });
   const [uploadedDocs, setUploadedDocs] = useState<any[]>([]);
   const [error, setError] = useState('');
@@ -52,6 +53,7 @@ export default function NewRequestPage() {
           urgency: formData.urgency,
           location: formData.location,
           targetAmount: formData.targetAmount ? parseFloat(formData.targetAmount) : undefined,
+          isAnonymous: formData.isAnonymous,
         }),
       });
 
@@ -242,6 +244,30 @@ export default function NewRequestPage() {
                 </ul>
               </div>
             )}
+          </div>
+
+          {/* Privacy Settings */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-lg font-bold text-gray-900 mb-4">
+              Privacy Settings
+            </h2>
+            <div className="flex items-start">
+              <input
+                id="isAnonymous"
+                type="checkbox"
+                checked={formData.isAnonymous}
+                onChange={(e) => setFormData({ ...formData, isAnonymous: e.target.checked })}
+                className="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+              />
+              <label htmlFor="isAnonymous" className="ml-3">
+                <span className="block text-sm font-medium text-gray-900">
+                  Post request anonymously
+                </span>
+                <span className="block text-sm text-gray-600">
+                  Your name will not be displayed publicly. Only admins can see your identity.
+                </span>
+              </label>
+            </div>
           </div>
 
           {/* Submit Button */}

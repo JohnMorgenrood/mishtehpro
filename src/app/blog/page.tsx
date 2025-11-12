@@ -40,11 +40,11 @@ export default function BlogPage() {
     try {
       const response = await fetch('/api/blog');
       if (response.ok) {
-        const data = await response.json();
+        const data: BlogPost[] = await response.json();
         setPosts(data);
         
         // Extract unique categories
-        const categorySet = new Set(data.map((post: BlogPost) => post.category));
+        const categorySet = new Set(data.map((post) => post.category));
         const uniqueCategories: string[] = ['All', ...Array.from(categorySet)];
         setCategories(uniqueCategories);
       }

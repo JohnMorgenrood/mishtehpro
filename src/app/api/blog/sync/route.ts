@@ -108,11 +108,18 @@ export async function POST() {
               imageUrl = placeholders[feed.category] || 'https://images.unsplash.com/photo-1504805572947-34fad45aed93?w=800&h=600&fit=crop';
             }
 
+            // Clean up excerpt - remove HTML tags and excess whitespace
+            const cleanExcerpt = (item.contentSnippet || item.content || '')
+              .replace(/<[^>]*>/g, '') // Remove HTML tags
+              .replace(/\s+/g, ' ') // Normalize whitespace
+              .trim()
+              .substring(0, 300);
+
             await prisma.blogPost.create({
               data: {
                 title: item.title.substring(0, 200),
                 slug,
-                excerpt: (item.contentSnippet || item.content || '').substring(0, 300),
+                excerpt: cleanExcerpt,
                 content: item.content || item.contentSnippet || item.title,
                 author: item.creator || 'External Source',
                 category: feed.category,

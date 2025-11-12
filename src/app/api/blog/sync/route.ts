@@ -89,28 +89,25 @@ export async function POST() {
           });
 
           if (!existing) {
-            // Try to extract image from content or use category placeholder
+            // Try to extract image from RSS content only - NO placeholders
             let imageUrl = item.enclosure?.url || null;
             
             if (!imageUrl && item.content) {
               const imgMatch = item.content.match(/<img[^>]+src=["']([^"']+)["']/);
-              if (imgMatch) imageUrl = imgMatch[1];
-            }
-            
-            // Category-based placeholder images from Unsplash
-            if (!imageUrl) {
-              const placeholders: Record<string, string> = {
-                'Christian News': 'https://images.unsplash.com/photo-1490730141103-6cac27aaab94?w=800&h=600&fit=crop',
-                'Faith & Culture': 'https://images.unsplash.com/photo-1507692049790-de58290a4334?w=800&h=600&fit=crop',
-                'Israel News': 'https://images.unsplash.com/photo-1552083375-1447ce886485?w=800&h=600&fit=crop',
-                'World News': 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&h=600&fit=crop',
-              };
-              imageUrl = placeholders[feed.category] || 'https://images.unsplash.com/photo-1504805572947-34fad45aed93?w=800&h=600&fit=crop';
+              if (imgMatch) {
+                // Validate it's a real image URL, not a broken one
+                const extractedUrl = imgMatch[1];
+                if (extractedUrl.startsWith('http') && !extractedUrl.includes('534687')) {
+                  imageUrl = extractedUrl;
+                }
+              }
             }
 
-            // Clean up excerpt - remove HTML tags and excess whitespace
+            // Clean up excerpt - remove ALL HTML tags, schema markup, and excess whitespace
             const cleanExcerpt = (item.contentSnippet || item.content || '')
-              .replace(/<[^>]*>/g, '') // Remove HTML tags
+              .replace(/<span[^>]*>.*?<\/span>/gi, '') // Remove span tags with content
+              .replace(/<[^>]*>/g, '') // Remove all HTML tags
+              .replace(/&[a-z]+;/gi, '') // Remove HTML entities
               .replace(/\s+/g, ' ') // Normalize whitespace
               .trim()
               .substring(0, 300);

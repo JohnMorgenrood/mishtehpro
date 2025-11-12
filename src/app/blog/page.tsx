@@ -151,55 +151,38 @@ export default function BlogPage() {
               {internalPosts.map((post) => (
                 <article
                   key={post.id}
-                  className="bg-white rounded-2xl shadow-soft overflow-hidden hover:shadow-soft-lg transition-all hover:scale-105"
+                  className="bg-white rounded-2xl shadow-soft p-6 hover:shadow-soft-lg transition-all hover:scale-105 border border-gray-100"
                 >
-                  {/* Image */}
-                  <div className="h-48 bg-gradient-to-br from-primary-100 to-secondary-100 relative overflow-hidden">
-                    {post.imageUrl ? (
-                      <img
-                        src={post.imageUrl}
-                        alt={post.title}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Calendar className="w-16 h-16 text-primary-300" />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-6">
-                    <span className="inline-block px-3 py-1 bg-primary-50 text-primary-600 text-xs font-semibold rounded-full mb-3">
+                  {/* Category Badge with gradient */}
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="inline-block px-4 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white text-xs font-semibold rounded-full">
                       {post.category}
                     </span>
-                    <h2 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
-                      {post.title}
-                    </h2>
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                      {post.excerpt}
-                    </p>
-                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                      <div className="flex items-center gap-2">
-                        <User className="w-4 h-4" />
-                        <span>{post.author}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        <span>{new Date(post.publishedAt).toLocaleDateString()}</span>
-                      </div>
-                    </div>
-                    <Link
-                      href={`/blog/${post.slug}`}
-                      className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-semibold transition-colors"
-                    >
-                      Read More
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
                   </div>
+                  
+                  <h2 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+                    {post.title}
+                  </h2>
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                    {post.excerpt}
+                  </p>
+                  <div className="flex items-center justify-between text-sm text-gray-500 mb-4 pt-4 border-t border-gray-100">
+                    <div className="flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      <span className="text-xs">{post.author}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4" />
+                      <span className="text-xs">{new Date(post.publishedAt).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-semibold transition-colors text-sm"
+                  >
+                    Read More
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
                 </article>
               ))}
             </div>
@@ -210,52 +193,53 @@ export default function BlogPage() {
         {externalPosts.length > 0 && (
           <div className="mb-16">
             <h2 className="text-3xl font-bold text-gray-900 mb-8">Latest News from Around the World</h2>
-            <div className="relative">
+            <div className="relative px-12">
               {/* Carousel Container */}
-              <div className="overflow-hidden">
-                <div className="flex gap-6 pb-4" style={{ 
-                  transform: `translateX(-${carouselIndex * 33.33}%)`,
-                  transition: 'transform 0.5s ease-in-out'
-                }}>
+              <div className="overflow-hidden rounded-2xl">
+                <div 
+                  className="flex transition-transform duration-500 ease-out"
+                  style={{ 
+                    transform: `translateX(-${carouselIndex * 100}%)`,
+                  }}
+                >
                   {externalPosts.map((post) => (
                     <article
                       key={post.id}
-                      className="flex-shrink-0 w-full md:w-1/2 lg:w-1/3 bg-white rounded-2xl shadow-soft overflow-hidden hover:shadow-soft-lg transition-all"
+                      className="w-full flex-shrink-0 px-2"
                     >
-                      {/* Image with gradient overlay */}
-                      <div className="h-40 bg-gradient-to-br from-primary-100 to-secondary-100 relative overflow-hidden">
-                        <img
-                          src={post.imageUrl || 'https://images.unsplash.com/photo-1504805572947-34fad45aed93?w=800&h=400&fit=crop'}
-                          alt={post.title}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                        <span className="absolute top-3 right-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-semibold text-primary-600 flex items-center gap-1">
-                          <ExternalLink className="w-3 h-3" />
-                          {post.category}
-                        </span>
-                      </div>
+                      <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-soft p-8 hover:shadow-soft-lg transition-all border border-gray-100 h-full">
+                        {/* Category badge with icon */}
+                        <div className="flex items-center gap-2 mb-4">
+                          <ExternalLink className="w-4 h-4 text-primary-600" />
+                          <span className="text-xs font-semibold text-primary-600 uppercase tracking-wide">
+                            {post.category}
+                          </span>
+                        </div>
 
-                      {/* Content */}
-                      <div className="p-5">
-                        <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
+                        <h3 className="text-2xl font-bold text-gray-900 mb-4 line-clamp-2">
                           {post.title}
                         </h3>
-                        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                        <p className="text-gray-600 text-base mb-6 line-clamp-4">
                           {post.excerpt}
                         </p>
-                        <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
-                          <span>{post.author}</span>
-                          <span>{new Date(post.publishedAt).toLocaleDateString()}</span>
+                        <div className="flex items-center justify-between text-sm text-gray-500 mb-6 pt-4 border-t border-gray-200">
+                          <div className="flex items-center gap-2">
+                            <User className="w-4 h-4" />
+                            <span className="line-clamp-1">{post.author}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="w-4 h-4" />
+                            <span>{new Date(post.publishedAt).toLocaleDateString()}</span>
+                          </div>
                         </div>
                         <a
                           href={post.sourceUrl || '#'}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-semibold text-sm transition-colors"
+                          className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-600 to-secondary-600 text-white font-semibold rounded-xl hover:scale-105 transition-all"
                         >
                           Read Full Article
-                          <ExternalLink className="w-4 h-4" />
+                          <ArrowRight className="w-5 h-5" />
                         </a>
                       </div>
                     </article>
@@ -264,19 +248,21 @@ export default function BlogPage() {
               </div>
 
               {/* Navigation Arrows */}
-              {externalPosts.length > 3 && (
+              {externalPosts.length > 1 && (
                 <>
                   <button
                     onClick={() => setCarouselIndex(Math.max(0, carouselIndex - 1))}
                     disabled={carouselIndex === 0}
-                    className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white rounded-full p-3 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all z-10"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 bg-white rounded-full p-4 shadow-lg hover:shadow-xl hover:scale-110 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all z-10"
+                    aria-label="Previous"
                   >
                     <ChevronLeft className="w-6 h-6 text-gray-700" />
                   </button>
                   <button
-                    onClick={() => setCarouselIndex(Math.min(externalPosts.length - 3, carouselIndex + 1))}
-                    disabled={carouselIndex >= externalPosts.length - 3}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white rounded-full p-3 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all z-10"
+                    onClick={() => setCarouselIndex(Math.min(externalPosts.length - 1, carouselIndex + 1))}
+                    disabled={carouselIndex >= externalPosts.length - 1}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 bg-white rounded-full p-4 shadow-lg hover:shadow-xl hover:scale-110 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all z-10"
+                    aria-label="Next"
                   >
                     <ChevronRight className="w-6 h-6 text-gray-700" />
                   </button>
@@ -284,15 +270,16 @@ export default function BlogPage() {
               )}
 
               {/* Dots Indicator */}
-              {externalPosts.length > 3 && (
-                <div className="flex justify-center gap-2 mt-6">
-                  {Array.from({ length: Math.ceil(externalPosts.length / 3) }).map((_, idx) => (
+              {externalPosts.length > 1 && (
+                <div className="flex justify-center gap-2 mt-8">
+                  {externalPosts.map((_, idx) => (
                     <button
                       key={idx}
                       onClick={() => setCarouselIndex(idx)}
-                      className={`w-2 h-2 rounded-full transition-all ${
-                        carouselIndex === idx ? 'bg-primary-600 w-8' : 'bg-gray-300'
+                      className={`h-2 rounded-full transition-all ${
+                        carouselIndex === idx ? 'bg-primary-600 w-8' : 'bg-gray-300 w-2 hover:bg-gray-400'
                       }`}
+                      aria-label={`Go to slide ${idx + 1}`}
                     />
                   ))}
                 </div>

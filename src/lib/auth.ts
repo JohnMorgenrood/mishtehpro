@@ -1,14 +1,14 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import GitHubProvider from 'next-auth/providers/github';
+import GoogleProvider from 'next-auth/providers/google';
 import { prisma } from './prisma';
 import bcrypt from 'bcryptjs';
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    GitHubProvider({
-      clientId: process.env.GITHUB_ID || '',
-      clientSecret: process.env.GITHUB_SECRET || '',
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
     }),
     CredentialsProvider({
       name: 'credentials',
@@ -50,8 +50,8 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      // Handle GitHub OAuth sign-in
-      if (account?.provider === 'github') {
+      // Handle Google OAuth sign-in
+      if (account?.provider === 'google') {
         try {
           const email = user.email;
           if (!email) return false;
@@ -66,8 +66,8 @@ export const authOptions: NextAuthOptions = {
             dbUser = await prisma.user.create({
               data: {
                 email,
-                fullName: user.name || 'GitHub User',
-                userType: 'DONOR', // Default to DONOR for GitHub sign-ins
+                fullName: user.name || 'Google User',
+                userType: 'DONOR', // Default to DONOR for Google sign-ins
                 image: user.image,
               },
             });

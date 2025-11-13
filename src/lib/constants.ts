@@ -3,17 +3,160 @@
 export const APP_NAME = 'MISHTEH';
 export const APP_DESCRIPTION = 'Connecting donors with people in need';
 
-// Request categories
-export const REQUEST_CATEGORIES = [
-  { value: 'FOOD', label: 'Food' },
-  { value: 'RENT', label: 'Rent' },
-  { value: 'BILLS', label: 'Bills' },
-  { value: 'FAMILY_SUPPORT', label: 'Family Support' },
-  { value: 'JOB_ASSISTANCE', label: 'Job Assistance' },
-  { value: 'MEDICAL', label: 'Medical' },
-  { value: 'EDUCATION', label: 'Education' },
-  { value: 'OTHER', label: 'Other' },
+// Request categories organized by main category
+export const REQUEST_CATEGORY_GROUPS = [
+  {
+    group: 'Basic Needs',
+    description: 'Essential support for daily living',
+    categories: [
+      { value: 'FOOD_GROCERIES', label: 'Food & Groceries' },
+      { value: 'RENT_HOUSING', label: 'Rent / Housing Support' },
+      { value: 'UTILITIES', label: 'Utilities (Water, Electricity, Gas)' },
+      { value: 'CLOTHING_ESSENTIALS', label: 'Clothing & Essentials' },
+      { value: 'TRANSPORTATION', label: 'Transportation (Bus Fare, Gas, Repairs)' },
+    ],
+  },
+  {
+    group: 'Family & Children',
+    description: 'Support for families facing hardship',
+    categories: [
+      { value: 'SINGLE_PARENTS', label: 'Single Parents' },
+      { value: 'CHILDCARE_SCHOOL', label: 'Childcare / School Supplies' },
+      { value: 'NEWBORN_BABY', label: 'Newborn / Baby Needs' },
+      { value: 'ADOPTION_FOSTER', label: 'Adoption & Foster Care Support' },
+      { value: 'FAMILY_EMERGENCY', label: 'Family Emergencies' },
+    ],
+  },
+  {
+    group: 'Health & Medical',
+    description: 'Physical, mental, and emotional well-being',
+    categories: [
+      { value: 'MEDICAL_BILLS', label: 'Medical Bills & Treatment' },
+      { value: 'PRESCRIPTION_MEDS', label: 'Prescription Medications' },
+      { value: 'DISABILITY_SUPPORT', label: 'Disability Support' },
+      { value: 'MENTAL_HEALTH', label: 'Mental Health Care / Counseling' },
+      { value: 'THERAPY_REHAB', label: 'Therapy or Rehabilitation' },
+    ],
+  },
+  {
+    group: 'Education & Career',
+    description: 'Helping people grow, learn, or find work',
+    categories: [
+      { value: 'TUITION_FEES', label: 'Tuition / School Fees' },
+      { value: 'BOOKS_SUPPLIES', label: 'Books & Supplies' },
+      { value: 'VOCATIONAL_TRAINING', label: 'Vocational Training / Courses' },
+      { value: 'JOB_ASSISTANCE', label: 'Job Search & Interview Assistance' },
+      { value: 'TECHNOLOGY_LEARNING', label: 'Technology for Learning' },
+    ],
+  },
+  {
+    group: 'Elderly & Retired',
+    description: 'Special support for seniors',
+    categories: [
+      { value: 'RETIREMENT_SUPPORT', label: 'Retirement Support / Living Expenses' },
+      { value: 'MOBILITY_EQUIPMENT', label: 'Medical & Mobility Equipment' },
+      { value: 'HOME_CARE', label: 'Home Care & Assistance' },
+      { value: 'SENIOR_SOCIAL_SUPPORT', label: 'Social Support / Companionship' },
+    ],
+  },
+  {
+    group: 'Emergency & Crisis Relief',
+    description: 'Urgent and unexpected life events',
+    categories: [
+      { value: 'NATURAL_DISASTER', label: 'Natural Disasters (Flood, Fire, Storm)' },
+      { value: 'ACCIDENT_INJURY', label: 'Accidents or Injuries' },
+      { value: 'DOMESTIC_VIOLENCE', label: 'Domestic Violence & Safe Housing' },
+      { value: 'FUNERAL_SUPPORT', label: 'Funeral or Bereavement Support' },
+      { value: 'LEGAL_AID_CRISIS', label: 'Legal Aid for Crisis Situations' },
+    ],
+  },
+  {
+    group: 'Community & Social Causes',
+    description: 'Requests that benefit groups',
+    categories: [
+      { value: 'NEIGHBORHOOD_PROJECT', label: 'Neighborhood Improvement Projects' },
+      { value: 'COMMUNITY_FOOD_DRIVE', label: 'Community Food Drives / Pantries' },
+      { value: 'YOUTH_PROGRAMS', label: 'Youth & After-School Programs' },
+      { value: 'CULTURAL_RELIGIOUS', label: 'Cultural / Religious Initiatives' },
+      { value: 'VOLUNTEER_NONPROFIT', label: 'Volunteer & Nonprofit Support' },
+    ],
+  },
+  {
+    group: 'Animals & Pets',
+    description: 'Support for pets and animals',
+    categories: [
+      { value: 'PET_FOOD_SUPPLIES', label: 'Pet Food & Supplies' },
+      { value: 'EMERGENCY_VET_CARE', label: 'Emergency Vet Care' },
+      { value: 'ANIMAL_RESCUE', label: 'Animal Rescue / Adoption Programs' },
+      { value: 'FARM_ANIMAL_AID', label: 'Farm Animal Assistance' },
+    ],
+  },
+  {
+    group: 'Disabled & Special Needs',
+    description: 'Inclusivity and accessibility support',
+    categories: [
+      { value: 'ADAPTIVE_EQUIPMENT', label: 'Adaptive Equipment (Wheelchairs, Hearing Aids)' },
+      { value: 'HOME_MODIFICATIONS', label: 'Accessible Home Modifications' },
+      { value: 'DISABLED_TRANSPORT', label: 'Transportation for Disabled Persons' },
+      { value: 'SUPPORT_ANIMALS', label: 'Support Animals & Training' },
+    ],
+  },
+  {
+    group: 'Veterans & Service Members',
+    description: 'Honoring those who served',
+    categories: [
+      { value: 'VETERAN_HOUSING', label: 'Reintegration & Housing Assistance' },
+      { value: 'PTSD_COUNSELING', label: 'PTSD & Counseling Support' },
+      { value: 'VETERAN_JOB_PLACEMENT', label: 'Job Placement & Education' },
+      { value: 'VETERAN_FAMILY_AID', label: 'Veteran Family Aid' },
+    ],
+  },
+  {
+    group: 'Entrepreneurship & Small Business',
+    description: 'Helping people become self-sufficient',
+    categories: [
+      { value: 'STARTUP_GRANT', label: 'Startup / Business Grants' },
+      { value: 'BUSINESS_TOOLS', label: 'Tools or Equipment Purchase' },
+      { value: 'BUSINESS_LICENSING', label: 'Licensing / Registration Fees' },
+      { value: 'BUSINESS_TRAINING', label: 'Marketing & Business Training' },
+    ],
+  },
+  {
+    group: 'Housing & Homelessness',
+    description: 'Shelter and safety focus',
+    categories: [
+      { value: 'EMERGENCY_SHELTER', label: 'Emergency Shelter' },
+      { value: 'HOME_REPAIRS', label: 'Home Repairs / Maintenance' },
+      { value: 'MOVING_ASSISTANCE', label: 'Moving Assistance' },
+      { value: 'EVICTION_PREVENTION', label: 'Rent Deposits / Eviction Prevention' },
+    ],
+  },
+  {
+    group: 'Immigrants & Refugees',
+    description: 'Helping newcomers find stability',
+    categories: [
+      { value: 'RELOCATION_COSTS', label: 'Relocation & Resettlement Costs' },
+      { value: 'LEGAL_DOCUMENTATION', label: 'Legal Documentation Fees' },
+      { value: 'LANGUAGE_INTEGRATION', label: 'Language Classes / Integration Support' },
+      { value: 'REFUGEE_EMERGENCY', label: 'Emergency Housing / Food for Refugees' },
+    ],
+  },
+  {
+    group: 'Special Situations',
+    description: 'Unique or custom requests',
+    categories: [
+      { value: 'JOB_LOSS_HARDSHIP', label: 'Lost Job / Temporary Financial Hardship' },
+      { value: 'TRAVEL_EMERGENCY', label: 'Travel for Medical or Family Emergencies' },
+      { value: 'UNEXPECTED_EXPENSES', label: 'Unexpected Expenses (Repairs, Theft, etc.)' },
+      { value: 'OTHER', label: 'Other (Custom Category)' },
+    ],
+  },
 ] as const;
+
+// Flat list of all categories for backward compatibility
+export const REQUEST_CATEGORIES: Array<{ value: string; label: string }> = REQUEST_CATEGORY_GROUPS.flatMap(group => 
+  group.categories.map(cat => ({ value: cat.value, label: cat.label }))
+);
 
 // Urgency levels
 export const URGENCY_LEVELS = [

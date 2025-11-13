@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { RequestCategory, UrgencyLevel } from '@prisma/client';
 import { Clock, MapPin, TrendingUp } from 'lucide-react';
 import { CurrencyDisplay } from './CurrencyDisplay';
+import { REQUEST_CATEGORIES } from '@/lib/constants';
 
 interface Request {
   id: string;
@@ -30,16 +31,11 @@ const urgencyColors = {
   CRITICAL: 'bg-red-100 text-red-800',
 };
 
-const categoryLabels: Record<RequestCategory, string> = {
-  FOOD: 'Food',
-  RENT: 'Rent',
-  BILLS: 'Bills',
-  FAMILY_SUPPORT: 'Family Support',
-  JOB_ASSISTANCE: 'Job Assistance',
-  MEDICAL: 'Medical',
-  EDUCATION: 'Education',
-  OTHER: 'Other',
-};
+// Create category labels map from constants
+const categoryLabelsMap = REQUEST_CATEGORIES.reduce((acc, cat) => {
+  acc[cat.value as RequestCategory] = cat.label;
+  return acc;
+}, {} as Record<RequestCategory, string>);
 
 export default function RequestCard({ request }: RequestCardProps) {
   const progressPercentage = request.targetAmount
@@ -51,7 +47,7 @@ export default function RequestCard({ request }: RequestCardProps) {
       {/* Header */}
       <div className="flex justify-between items-start mb-3">
         <span className="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-primary-100 text-primary-800">
-          {categoryLabels[request.category]}
+          {categoryLabelsMap[request.category] || request.category}
         </span>
         <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${urgencyColors[request.urgency]}`}>
           {request.urgency}

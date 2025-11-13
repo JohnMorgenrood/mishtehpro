@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import FileUpload from '@/components/FileUpload';
+import { REQUEST_CATEGORY_GROUPS } from '@/lib/constants';
 
 export default function NewRequestPage() {
   const router = useRouter();
@@ -11,7 +12,7 @@ export default function NewRequestPage() {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: 'FOOD',
+    category: 'FOOD_GROCERIES',
     urgency: 'MEDIUM',
     location: '',
     targetAmount: '',
@@ -133,15 +134,19 @@ export default function NewRequestPage() {
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                 >
-                  <option value="FOOD">Food</option>
-                  <option value="RENT">Rent</option>
-                  <option value="BILLS">Bills</option>
-                  <option value="FAMILY_SUPPORT">Family Support</option>
-                  <option value="JOB_ASSISTANCE">Job Assistance</option>
-                  <option value="MEDICAL">Medical</option>
-                  <option value="EDUCATION">Education</option>
-                  <option value="OTHER">Other</option>
+                  {REQUEST_CATEGORY_GROUPS.map((group) => (
+                    <optgroup key={group.group} label={group.group}>
+                      {group.categories.map((cat) => (
+                        <option key={cat.value} value={cat.value}>
+                          {cat.label}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
                 </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Select the category that best describes your request
+                </p>
               </div>
 
               {/* Urgency */}

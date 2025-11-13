@@ -71,8 +71,8 @@ export default function DonationForm({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          amount: usdAmount, // Always send USD to PayPal
-          currency: 'USD',
+          amount: donationAmount, // Send amount in user's currency
+          currency: userCurrency, // Send user's selected currency
         }),
       });
 
@@ -136,7 +136,7 @@ export default function DonationForm({
     <PayPalScriptProvider
       options={{
         clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
-        currency: 'USD',
+        currency: userCurrency,
       }}
     >
       <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
@@ -225,11 +225,6 @@ export default function DonationForm({
                 required
               />
             </div>
-            {donationAmount > 0 && userCurrency !== 'USD' && (
-              <p className="text-xs text-gray-500 mt-1">
-                ≈ {formatCurrency(usdAmount, 'USD')} USD will be charged via PayPal
-              </p>
-            )}
           </div>
 
           {/* Message */}
@@ -292,16 +287,6 @@ export default function DonationForm({
                 </div>
               </div>
               
-              {userCurrency !== 'USD' && (
-                <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                  <p className="text-sm text-blue-800">
-                    💱 PayPal will charge: <strong>{formatCurrency(usdAmount, 'USD')}</strong> (converted from {formatCurrency(donationAmount, userCurrency)})
-                  </p>
-                  <p className="text-xs text-blue-600 mt-1">
-                    Exchange rate: 1 USD ≈ {CURRENCIES[userCurrency].symbol}{(1 / toPayPalAmount(1, userCurrency)).toFixed(2)}
-                  </p>
-                </div>
-              )}
               <PayPalButtons
                 style={{ layout: 'vertical' }}
                 createOrder={createOrder}
@@ -323,11 +308,6 @@ export default function DonationForm({
 
         <p className="mt-4 text-xs text-gray-500 text-center">
           Your donation helps those in need. Secure payment powered by PayPal.
-          {userCurrency !== 'USD' && (
-            <span className="block mt-1">
-              Amounts are converted to USD for payment processing.
-            </span>
-          )}
         </p>
       </div>
     </PayPalScriptProvider>

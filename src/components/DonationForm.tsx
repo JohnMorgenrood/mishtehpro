@@ -183,11 +183,12 @@ export default function DonationForm({
                     setAmount(quickAmount.toString());
                     setShowPayPal(false);
                   }}
-                  className={`px-4 py-2 border rounded-md text-sm font-medium transition-colors ${
+                  className={`px-2 py-2 border rounded-md text-xs font-medium transition-colors whitespace-nowrap overflow-hidden ${
                     amount === quickAmount.toString()
                       ? 'bg-primary-600 text-white border-primary-600'
                       : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                   }`}
+                  title={`${currencySymbol}${quickAmount}`}
                 >
                   {currencySymbol}{quickAmount}
                 </button>

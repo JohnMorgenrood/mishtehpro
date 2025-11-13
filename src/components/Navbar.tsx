@@ -3,8 +3,9 @@
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
-import { Heart, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import Image from 'next/image';
 
 export default function Navbar() {
   const { data: session, status } = useSession();
@@ -23,7 +24,13 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <Heart className="w-8 h-8 text-primary-600 group-hover:scale-110 transition-transform" fill="currentColor" />
+            <Image 
+              src="/assets/logo.png" 
+              alt="Mishteh Logo" 
+              width={40} 
+              height={40}
+              className="group-hover:scale-110 transition-transform"
+            />
             <span className="text-2xl font-display font-bold gradient-text">MISHTEH</span>
           </Link>
 

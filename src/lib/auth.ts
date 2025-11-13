@@ -66,6 +66,7 @@ export const authOptions: NextAuthOptions = {
             dbUser = await prisma.user.create({
               data: {
                 email,
+                password: null, // OAuth users don't have passwords
                 fullName: user.name || 'Google User',
                 userType: 'DONOR', // Default to DONOR for Google sign-ins
                 image: user.image,

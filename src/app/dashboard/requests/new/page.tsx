@@ -1,11 +1,12 @@
 'use client';
 
 // Updated with comprehensive category system - 80+ categories in 14 groups
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import FileUpload from '@/components/FileUpload';
 import { REQUEST_CATEGORY_GROUPS } from '@/lib/constants';
+import { MapPin } from 'lucide-react';
 
 export default function NewRequestPage() {
   const router = useRouter();
@@ -22,6 +23,47 @@ export default function NewRequestPage() {
   const [uploadedDocs, setUploadedDocs] = useState<any[]>([]);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+
+  // Auto-detect location on mount
+  useEffect(() => {
+    if (!formData.location) {
+      detectLocation();
+    }
+  }, []);
+
+  const detectLocation = async () => {
+    setIsDetectingLocation(true);
+    try {
+      // Try to get user's position
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            
+            // Use reverse geocoding to get city/country
+            const response = await fetch(
+              `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+            );
+            const data = await response.json();
+            
+            const location = `${data.city || data.locality || ''}, ${data.countryName || ''}`.trim();
+            if (location !== ',') {
+              setFormData(prev => ({ ...prev, location }));
+            }
+            setIsDetectingLocation(false);
+          },
+          (error) => {
+            console.log('Location detection declined or unavailable');
+            setIsDetectingLocation(false);
+          }
+        );
+      }
+    } catch (error) {
+      console.error('Error detecting location:', error);
+      setIsDetectingLocation(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -174,15 +216,35 @@ export default function NewRequestPage() {
                 <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
                   Location *
                 </label>
-                <input
-                  id="location"
-                  type="text"
-                  required
-                  value={formData.location}
-                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
-                  placeholder="City, State"
-                />
+                <div className="relative">
+                  <input
+                    id="location"
+                    type="text"
+                    required
+                    value={formData.location}
+                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                    className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                    placeholder="City, Country"
+                  />
+                  {isDetectingLocation && (
+                    <div className="absolute right-3 top-2.5">
+                      <div className="animate-spin h-5 w-5 border-2 border-primary-600 border-t-transparent rounded-full"></div>
+                    </div>
+                  )}
+                  {!isDetectingLocation && !formData.location && (
+                    <button
+                      type="button"
+                      onClick={detectLocation}
+                      className="absolute right-2 top-2 p-1 text-gray-400 hover:text-primary-600 transition-colors"
+                      title="Detect my location"
+                    >
+                      <MapPin className="h-5 w-5" />
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  {isDetectingLocation ? 'Detecting your location...' : 'Location auto-detected or enter manually'}
+                </p>
               </div>
 
               {/* Target Amount */}

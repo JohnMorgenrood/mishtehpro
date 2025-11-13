@@ -40,9 +40,10 @@ export async function POST(request: NextRequest) {
       ? `${captureResult.payer.name.given_name} ${captureResult.payer.name.surname}`
       : null;
 
-    // Calculate platform fee (e.g., 2 ZAR + 3%)
+    // Calculate platform fee: $2 USD fixed + 3% of amount
+    // This fee is what the platform (you) keeps
     const feeAmount = 2 + (amount * 0.03);
-    const netAmount = amount - feeAmount;
+    const netAmount = amount - feeAmount; // This is what the recipient gets
 
     // Get request details if provided
     let request_details = null;
@@ -61,12 +62,12 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create donation record
+    // Create donation record (stores the full amount paid by donor)
     const donation = await prisma.donation.create({
       data: {
         requestId: requestId || null,
         donorId: session.user.id,
-        amount,
+        amount, // Full amount paid
         message: message || null,
         anonymous: anonymous || false,
         paymentMethod: 'PAYPAL',
@@ -75,7 +76,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Create transaction record for the donation
+    // Create transaction record for the donation (DISBURSEMENT to recipient)
     const transaction = await prisma.transaction.create({
       data: {
         type: 'DONATION',
@@ -99,14 +100,14 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Create a separate transaction for the platform fee
+    // Create a separate transaction for the platform fee (revenue for platform owner)
     await prisma.transaction.create({
       data: {
         type: 'FEE',
         status: 'COMPLETED',
-        amount: feeAmount,
+        amount: feeAmount, // Platform's revenue ($2 + 3%)
         feeAmount: 0,
-        netAmount: feeAmount,
+        netAmount: feeAmount, // This goes to platform owner
         currency,
         paymentGateway: 'PAYPAL',
         paymentId: `${orderId}-fee`,
@@ -116,6 +117,7 @@ export async function POST(request: NextRequest) {
         requestId: requestId || null,
         requestTitle: request_details?.title || null,
         completedAt: new Date(),
+        adminNotes: `Platform fee from donation. Fixed: $2.00, Percentage: ${(amount * 0.03).toFixed(2)} (3%)`,
       },
     });
 
@@ -126,7 +128,7 @@ export async function POST(request: NextRequest) {
           userId: request_details.userId,
           type: 'DONATION_RECEIVED',
           title: 'New Donation Received',
-          message: `${session.user.name} donated $${amount.toFixed(2)} to your request "${request_details.title}"`,
+          message: `${session.user.name} donated $${netAmount.toFixed(2)} to your request "${request_details.title}" (after platform fees)`,
           read: false,
         },
       });

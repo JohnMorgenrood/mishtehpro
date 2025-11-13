@@ -9,6 +9,7 @@ import {
   getQuickAmounts,
   toPayPalAmount,
   getConversionMessage,
+  convertCurrency,
   CURRENCIES,
   Currency,
 } from '@/lib/currency';
@@ -46,6 +47,12 @@ export default function DonationForm({
 
   const donationAmount = parseFloat(amount) || 0;
   const usdAmount = toPayPalAmount(donationAmount, userCurrency);
+  
+  // Calculate platform fee (R2 or equivalent + 3%)
+  const platformFeeFixed = userCurrency === 'USD' ? 2 : convertCurrency(2, 'USD', userCurrency);
+  const platformFeePercent = donationAmount * 0.03;
+  const totalPlatformFee = platformFeeFixed + platformFeePercent;
+  const recipientReceives = donationAmount - totalPlatformFee;
 
   const handleAmountConfirm = () => {
     if (donationAmount <= 0) {
@@ -263,14 +270,32 @@ export default function DonationForm({
           {/* PayPal Buttons or Confirm Button */}
           {showPayPal && donationAmount > 0 ? (
             <div className="mb-4">
+              {/* Fee Breakdown */}
+              <div className="mb-3 p-4 bg-green-50 border border-green-200 rounded-md">
+                <h4 className="font-semibold text-green-900 mb-2">💚 Donation Breakdown</h4>
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-green-800">Your donation:</span>
+                    <span className="font-semibold text-green-900">{formatCurrency(donationAmount, userCurrency)}</span>
+                  </div>
+                  <div className="flex justify-between text-xs text-green-700">
+                    <span>Platform fee ({currencySymbol}{platformFeeFixed.toFixed(2)} + 3%):</span>
+                    <span>-{formatCurrency(totalPlatformFee, userCurrency)}</span>
+                  </div>
+                  <div className="flex justify-between pt-2 border-t border-green-300">
+                    <span className="font-semibold text-green-900">Recipient receives:</span>
+                    <span className="font-bold text-green-900">{formatCurrency(recipientReceives, userCurrency)}</span>
+                  </div>
+                </div>
+              </div>
+              
               {userCurrency !== 'USD' && (
                 <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
                   <p className="text-sm text-blue-800">
-                    💱 {getConversionMessage(donationAmount, userCurrency)}
+                    💱 PayPal will charge: <strong>{formatCurrency(usdAmount, 'USD')}</strong> (converted from {formatCurrency(donationAmount, userCurrency)})
                   </p>
                   <p className="text-xs text-blue-600 mt-1">
-                    Exchange rate: 1 USD = {CURRENCIES[userCurrency].symbol}
-                    {(1 / toPayPalAmount(1, userCurrency)).toFixed(2)}
+                    Exchange rate: 1 USD ≈ {CURRENCIES[userCurrency].symbol}{(1 / toPayPalAmount(1, userCurrency)).toFixed(2)}
                   </p>
                 </div>
               )}

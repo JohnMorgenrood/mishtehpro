@@ -64,23 +64,40 @@ export default function RegisterPage() {
   }, []);
 
   const initAutocomplete = () => {
-    if (!locationInputRef.current || !window.google) return;
+    if (!locationInputRef.current) {
+      console.log('Location input ref not ready');
+      return;
+    }
+    
+    if (!window.google) {
+      console.log('Google Maps not loaded yet');
+      return;
+    }
 
-    autocompleteRef.current = new window.google.maps.places.Autocomplete(
-      locationInputRef.current,
-      {
-        types: ['geocode', 'establishment'],
-        fields: ['address_components', 'formatted_address', 'geometry'],
-      }
-    );
+    console.log('Initializing autocomplete...');
 
-    autocompleteRef.current.addListener('place_changed', () => {
-      const place = autocompleteRef.current.getPlace();
+    try {
+      autocompleteRef.current = new window.google.maps.places.Autocomplete(
+        locationInputRef.current,
+        {
+          types: ['geocode', 'establishment'],
+          fields: ['address_components', 'formatted_address', 'geometry'],
+        }
+      );
+
+      autocompleteRef.current.addListener('place_changed', () => {
+        const place = autocompleteRef.current.getPlace();
+        console.log('Place selected:', place);
+        
+        if (place.formatted_address) {
+          setFormData(prev => ({ ...prev, location: place.formatted_address }));
+        }
+      });
       
-      if (place.formatted_address) {
-        setFormData(prev => ({ ...prev, location: place.formatted_address }));
-      }
-    });
+      console.log('Autocomplete initialized successfully');
+    } catch (error) {
+      console.error('Error initializing autocomplete:', error);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

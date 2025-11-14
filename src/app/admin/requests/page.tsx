@@ -15,7 +15,7 @@ interface Request {
   urgency: string;
   status: string;
   targetAmount: number;
-  raisedAmount: number;
+  currentAmount: number;
   location: string;
   createdAt: string;
   user: {
@@ -296,14 +296,14 @@ export default function AdminRequestsPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm">
-                        <CurrencyDisplay amount={request.raisedAmount} />
+                        <CurrencyDisplay amount={request.currentAmount} />
                         <span className="text-gray-500"> / </span>
-                        <CurrencyDisplay amount={request.targetAmount} />
+                        <CurrencyDisplay amount={request.targetAmount || 0} />
                         <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
                           <div
                             className="bg-primary-600 h-1.5 rounded-full"
                             style={{
-                              width: `${Math.min((request.raisedAmount / request.targetAmount) * 100, 100)}%`,
+                              width: `${Math.min(((request.currentAmount || 0) / (request.targetAmount || 1)) * 100, 100)}%`,
                             }}
                           ></div>
                         </div>

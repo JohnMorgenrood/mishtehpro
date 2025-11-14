@@ -20,6 +20,7 @@ async function getFeaturedRequests() {
             id: true,
             fullName: true,
             location: true,
+            image: true,
           },
         },
         _count: {

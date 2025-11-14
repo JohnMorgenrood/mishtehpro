@@ -3,20 +3,39 @@
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
-import { Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { Menu, X, ChevronDown } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 
 export default function Navbar() {
   const { data: session, status } = useSession();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [adminDropdownOpen, setAdminDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const isActive = (path: string) => pathname === path;
 
   const handleSignOut = () => {
     signOut({ callbackUrl: '/' });
   };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setAdminDropdownOpen(false);
+      }
+    };
+
+    if (adminDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [adminDropdownOpen]);
 
   return (
     <nav className="glass sticky top-0 z-50 border-b border-primary-100">
@@ -111,50 +130,55 @@ export default function Navbar() {
                   Profile
                 </Link>
                 
-                {/* Admin Links */}
+                {/* Admin Dropdown Menu */}
                 {session.user.userType === 'ADMIN' && (
-                  <>
-                    <Link
-                      href="/admin"
-                      className={`text-sm font-medium transition-all ${
+                  <div className="relative" ref={dropdownRef}>
+                    <button
+                      onClick={() => setAdminDropdownOpen(!adminDropdownOpen)}
+                      className={`flex items-center gap-1 text-sm font-medium transition-all ${
                         pathname?.startsWith('/admin')
                           ? 'text-primary-600 font-semibold' 
                           : 'text-gray-700 hover:text-primary-600 hover:scale-105'
                       }`}
                     >
                       Admin
-                    </Link>
-                    <Link
-                      href="/admin/accounts"
-                      className={`text-sm font-medium transition-all ${
-                        isActive('/admin/accounts')
-                          ? 'text-primary-600 font-semibold' 
-                          : 'text-gray-700 hover:text-primary-600 hover:scale-105'
-                      }`}
-                    >
-                      Accounts
-                    </Link>
-                    <Link
-                      href="/admin/requests"
-                      className={`text-sm font-medium transition-all ${
-                        pathname?.startsWith('/admin/requests')
-                          ? 'text-primary-600 font-semibold' 
-                          : 'text-gray-700 hover:text-primary-600 hover:scale-105'
-                      }`}
-                    >
-                      Admin Requests
-                    </Link>
-                    <Link
-                      href="/admin/transactions"
-                      className={`text-sm font-medium transition-all ${
-                        pathname?.startsWith('/admin/transactions')
-                          ? 'text-primary-600 font-semibold' 
-                          : 'text-gray-700 hover:text-primary-600 hover:scale-105'
-                      }`}
-                    >
-                      Transactions
-                    </Link>
-                  </>
+                      <ChevronDown className={`w-4 h-4 transition-transform ${adminDropdownOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    
+                    {/* Dropdown Menu */}
+                    {adminDropdownOpen && (
+                      <div className="absolute top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                        <Link
+                          href="/admin"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-colors"
+                          onClick={() => setAdminDropdownOpen(false)}
+                        >
+                          Dashboard
+                        </Link>
+                        <Link
+                          href="/admin/accounts"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-colors"
+                          onClick={() => setAdminDropdownOpen(false)}
+                        >
+                          Accounts
+                        </Link>
+                        <Link
+                          href="/admin/requests"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-colors"
+                          onClick={() => setAdminDropdownOpen(false)}
+                        >
+                          Requests
+                        </Link>
+                        <Link
+                          href="/admin/transactions"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-colors"
+                          onClick={() => setAdminDropdownOpen(false)}
+                        >
+                          Transactions
+                        </Link>
+                      </div>
+                    )}
+                  </div>
                 )}
                 
                 <div className="flex items-center gap-3">

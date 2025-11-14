@@ -18,8 +18,8 @@ export default function LoginPage() {
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
-    // Google will use the signIn callback in auth.ts to determine redirect
-    await signIn('google', { callbackUrl: '/dashboard' });
+    // Google OAuth will redirect through the callback
+    await signIn('google', { callbackUrl: '/auth/callback' });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

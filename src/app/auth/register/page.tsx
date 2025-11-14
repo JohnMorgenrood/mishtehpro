@@ -54,7 +54,7 @@ export default function RegisterPage() {
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
-    await signIn('google', { callbackUrl: '/dashboard' });
+    await signIn('google', { callbackUrl: '/auth/callback' });
   };
 
   // Load Google Maps API

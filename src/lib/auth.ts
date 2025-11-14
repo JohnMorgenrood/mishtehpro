@@ -4,6 +4,9 @@ import GoogleProvider from 'next-auth/providers/google';
 import { prisma } from './prisma';
 import bcrypt from 'bcryptjs';
 
+// Admin email addresses
+const ADMIN_EMAILS = ['mishteh144@gmail.com', 'rubyroyal1@gmail.com'];
+
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
@@ -38,11 +41,14 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Invalid credentials');
         }
 
+        // Check if user is an admin
+        const userType = ADMIN_EMAILS.includes(user.email) ? 'ADMIN' : user.userType;
+
         return {
           id: user.id,
           email: user.email,
           name: user.fullName,
-          userType: user.userType,
+          userType: userType,
           image: user.image,
         };
       },
@@ -63,20 +69,26 @@ export const authOptions: NextAuthOptions = {
 
           // Create user if doesn't exist
           if (!dbUser) {
+            // Check if email is admin
+            const userType = ADMIN_EMAILS.includes(email) ? 'ADMIN' : 'DONOR';
+            
             dbUser = await prisma.user.create({
               data: {
                 email,
                 password: null, // OAuth users don't have passwords
                 fullName: user.name || 'Google User',
-                userType: 'DONOR', // Default to DONOR for Google sign-ins
+                userType: userType,
                 image: user.image,
               },
             });
           }
 
+          // Override userType if email is in admin list
+          const finalUserType = ADMIN_EMAILS.includes(email) ? 'ADMIN' : dbUser.userType;
+
           // Store the database user ID in the account
           user.id = dbUser.id;
-          (user as any).userType = dbUser.userType;
+          (user as any).userType = finalUserType;
         } catch (error) {
           console.error('Error in signIn callback:', error);
           return false;
@@ -88,14 +100,20 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.userType = (user as any).userType;
+        token.email = user.email;
       } else if (token.id) {
-        // Refresh user data from database to get latest userType
-        const dbUser = await prisma.user.findUnique({
-          where: { id: token.id as string },
-          select: { userType: true },
-        });
-        if (dbUser) {
-          token.userType = dbUser.userType;
+        // Check if email is admin
+        if (token.email && ADMIN_EMAILS.includes(token.email as string)) {
+          token.userType = 'ADMIN';
+        } else {
+          // Refresh user data from database to get latest userType
+          const dbUser = await prisma.user.findUnique({
+            where: { id: token.id as string },
+            select: { userType: true },
+          });
+          if (dbUser) {
+            token.userType = dbUser.userType;
+          }
         }
       }
       return token;
@@ -108,10 +126,17 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async redirect({ url, baseUrl }) {
-      // If user is being redirected after sign in
+      // If user is being redirected after sign in, check the URL
       if (url.startsWith(baseUrl)) {
         return url;
       }
+      
+      // For callback URLs, redirect based on user type
+      if (url.includes('/api/auth/callback')) {
+        // This will be handled by the calling page
+        return baseUrl;
+      }
+      
       // Default redirect to base URL
       return baseUrl;
     },

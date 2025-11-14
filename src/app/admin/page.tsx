@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 interface Stats {
@@ -45,6 +47,8 @@ interface Document {
 }
 
 export default function AdminDashboard() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [stats, setStats] = useState<Stats | null>(null);
   const [pendingRequests, setPendingRequests] = useState<Request[]>([]);
   const [activeRequests, setActiveRequests] = useState<Request[]>([]);
@@ -53,8 +57,14 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (status === 'unauthenticated') {
+      router.push('/auth/login');
+    } else if (status === 'authenticated' && session?.user?.userType !== 'ADMIN') {
+      router.push('/dashboard');
+    } else if (status === 'authenticated') {
+      fetchData();
+    }
+  }, [status, session, router]);
 
   const fetchData = async () => {
     try {
@@ -66,8 +76,14 @@ export default function AdminDashboard() {
       ]);
 
       if (statsRes.ok) setStats(await statsRes.json());
-      if (pendingRes.ok) setPendingRequests(await pendingRes.json());
-      if (activeRes.ok) setActiveRequests(await activeRes.json());
+      if (pendingRes.ok) {
+        const data = await pendingRes.json();
+        setPendingRequests(data.requests || []);
+      }
+      if (activeRes.ok) {
+        const data = await activeRes.json();
+        setActiveRequests(data.requests || []);
+      }
       if (docsRes.ok) setPendingDocuments(await docsRes.json());
     } catch (error) {
       console.error('Error fetching admin data:', error);

@@ -41,7 +41,58 @@ export default function NewRequestPage() {
             const { latitude, longitude } = position.coords;
             
             try {
-              // Try Nominatim (OpenStreetMap) first - better suburb detail
+              // Use Google Maps Geocoding API for precise location
+              const googleMapsKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+              const response = await fetch(
+                `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${googleMapsKey}`
+              );
+              const data = await response.json();
+              
+              if (data.results && data.results.length > 0) {
+                const result = data.results[0];
+                const components = result.address_components;
+                
+                const parts = [];
+                let suburb = '';
+                let city = '';
+                let state = '';
+                let country = '';
+                
+                // Extract address components
+                components.forEach((component: any) => {
+                  if (component.types.includes('sublocality') || component.types.includes('neighborhood')) {
+                    suburb = component.long_name;
+                  }
+                  if (component.types.includes('locality')) {
+                    city = component.long_name;
+                  }
+                  if (component.types.includes('administrative_area_level_1')) {
+                    state = component.long_name;
+                  }
+                  if (component.types.includes('country')) {
+                    country = component.long_name;
+                  }
+                });
+                
+                // Build location string
+                if (suburb) parts.push(suburb);
+                if (city) parts.push(city);
+                if (state) parts.push(state);
+                if (country) parts.push(country);
+                
+                const location = parts.join(', ');
+                if (location) {
+                  setFormData(prev => ({ ...prev, location }));
+                  setIsDetectingLocation(false);
+                  return;
+                }
+              }
+            } catch (error) {
+              console.log('Google Maps failed, trying fallback...');
+            }
+            
+            // Fallback to OpenStreetMap
+            try {
               const nominatimResponse = await fetch(
                 `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
               );
@@ -51,19 +102,10 @@ export default function NewRequestPage() {
                 const addr = nominatimData.address;
                 const parts = [];
                 
-                // Add suburb/neighborhood
                 if (addr.suburb) parts.push(addr.suburb);
                 else if (addr.neighbourhood) parts.push(addr.neighbourhood);
-                else if (addr.quarter) parts.push(addr.quarter);
-                
-                // Add city/town
-                if (addr.city) parts.push(addr.city);
-                else if (addr.town) parts.push(addr.town);
-                
-                // Add state/province
+                if (addr.city || addr.town) parts.push(addr.city || addr.town);
                 if (addr.state) parts.push(addr.state);
-                
-                // Add country
                 if (addr.country) parts.push(addr.country);
                 
                 const location = parts.join(', ');
@@ -74,32 +116,16 @@ export default function NewRequestPage() {
                 }
               }
             } catch (error) {
-              console.log('Nominatim failed, trying BigDataCloud...');
+              console.log('OpenStreetMap failed');
             }
             
-            // Fallback to BigDataCloud
-            const response = await fetch(
-              `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
-            );
-            const data = await response.json();
-            
-            const parts = [];
-            if (data.locality) parts.push(data.locality);
-            if (data.city && data.city !== data.locality) parts.push(data.city);
-            if (data.principalSubdivision) parts.push(data.principalSubdivision);
-            if (data.countryName) parts.push(data.countryName);
-            
-            const location = parts.join(', ');
-            if (location) {
-              setFormData(prev => ({ ...prev, location }));
-            }
             setIsDetectingLocation(false);
           },
           (error) => {
             console.log('Location detection declined or unavailable');
             setIsDetectingLocation(false);
           },
-          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
         );
       }
     } catch (error) {

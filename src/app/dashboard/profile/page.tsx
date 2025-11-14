@@ -246,14 +246,16 @@ export default function ProfileSettingsPage() {
 
                 <div>
                   <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone Number
+                    Phone Number *
                   </label>
                   <input
                     id="phone"
                     type="tel"
+                    required
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                    placeholder="0612345678"
                   />
                 </div>
 
@@ -264,10 +266,11 @@ export default function ProfileSettingsPage() {
                   <input
                     id="location"
                     type="text"
+                    ref={locationInputRef}
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
-                    placeholder="City, Country"
+                    placeholder="Start typing your address..."
                   />
                 </div>
 

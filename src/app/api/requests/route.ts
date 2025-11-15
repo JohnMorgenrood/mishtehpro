@@ -9,6 +9,7 @@ const createRequestSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters'),
   description: z.string().min(20, 'Description must be at least 20 characters'),
   category: z.enum(['FOOD', 'RENT', 'BILLS', 'FAMILY_SUPPORT', 'JOB_ASSISTANCE', 'MEDICAL', 'EDUCATION', 'OTHER']),
+  customCategory: z.string().optional(),
   urgency: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']),
   location: z.string().min(2, 'Location is required'),
   targetAmount: z.number().positive().optional(),

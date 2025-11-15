@@ -21,10 +21,6 @@ export async function POST(request: NextRequest) {
     const idNumber = formData.get('idNumber') as string | null;
     const dateOfBirth = formData.get('dateOfBirth') as string | null;
     const idDocumentType = formData.get('idDocumentType') as string | null;
-    const address = formData.get('address') as string | null;
-    const facebookUrl = formData.get('facebookUrl') as string | null;
-    const twitterUrl = formData.get('twitterUrl') as string | null;
-    const instagramUrl = formData.get('instagramUrl') as string | null;
     
     // Validate required fields
     if (!fullName || !email || !password || !userType) {
@@ -127,10 +123,6 @@ export async function POST(request: NextRequest) {
         idDocumentUrl,
         idDocumentType,
         idNumber,
-        address,
-        facebookUrl,
-        twitterUrl,
-        instagramUrl,
         selfieUrl,
         dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
       },

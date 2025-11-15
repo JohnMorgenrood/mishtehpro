@@ -29,13 +29,9 @@ export default function RegisterPage() {
     countryCode: '+27',
     phone: '',
     location: '',
-    address: '',
     idNumber: '',
     dateOfBirth: '',
     idDocumentType: 'national_id' as 'national_id' | 'passport' | 'drivers_license',
-    facebookUrl: '',
-    twitterUrl: '',
-    instagramUrl: '',
   });
   
   // FICA documents for REQUESTER users
@@ -192,10 +188,6 @@ export default function RegisterPage() {
         submitData.append('idNumber', formData.idNumber);
         submitData.append('dateOfBirth', formData.dateOfBirth);
         submitData.append('idDocumentType', formData.idDocumentType);
-        submitData.append('address', formData.address);
-        submitData.append('facebookUrl', formData.facebookUrl);
-        submitData.append('twitterUrl', formData.twitterUrl);
-        submitData.append('instagramUrl', formData.instagramUrl);
         
         if (ficaDocuments.profilePhoto) {
           submitData.append('profilePhoto', ficaDocuments.profilePhoto);
@@ -435,67 +427,6 @@ export default function RegisterPage() {
                   value={ficaDocuments.idDocument}
                   onFileSelect={(file) => setFicaDocuments({ ...ficaDocuments, idDocument: file })}
                 />
-
-                <div>
-                  <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
-                    Physical Address (Optional)
-                  </label>
-                  <textarea
-                    id="address"
-                    rows={3}
-                    value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                    placeholder="Enter your physical address"
-                  />
-                </div>
-
-                <div className="space-y-3">
-                  <h3 className="text-sm font-medium text-gray-700">Social Media Profiles (Optional)</h3>
-                  <p className="text-sm text-gray-500">Share your social media profiles to help us verify your identity</p>
-                  
-                  <div>
-                    <label htmlFor="facebookUrl" className="block text-xs text-gray-600 mb-1">
-                      Facebook Profile URL
-                    </label>
-                    <input
-                      type="url"
-                      id="facebookUrl"
-                      value={formData.facebookUrl}
-                      onChange={(e) => setFormData({ ...formData, facebookUrl: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                      placeholder="https://facebook.com/yourprofile"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="twitterUrl" className="block text-xs text-gray-600 mb-1">
-                      X (Twitter) Profile URL
-                    </label>
-                    <input
-                      type="url"
-                      id="twitterUrl"
-                      value={formData.twitterUrl}
-                      onChange={(e) => setFormData({ ...formData, twitterUrl: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                      placeholder="https://twitter.com/yourhandle"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="instagramUrl" className="block text-xs text-gray-600 mb-1">
-                      Instagram Profile URL
-                    </label>
-                    <input
-                      type="url"
-                      id="instagramUrl"
-                      value={formData.instagramUrl}
-                      onChange={(e) => setFormData({ ...formData, instagramUrl: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                      placeholder="https://instagram.com/yourhandle"
-                    />
-                  </div>
-                </div>
 
                 <FicaUpload
                   label="Selfie with ID"

@@ -1,6 +1,9 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import { RequestCategory, UrgencyLevel } from '@prisma/client';
-import { Clock, MapPin, TrendingUp, User } from 'lucide-react';
+import { Clock, MapPin, TrendingUp, User, Share2, X, Facebook, Twitter, MessageCircle, Copy, Check } from 'lucide-react';
 import { CurrencyDisplay } from './CurrencyDisplay';
 import { REQUEST_CATEGORIES } from '@/lib/constants';
 import Image from 'next/image';
@@ -41,6 +44,9 @@ const categoryLabelsMap = REQUEST_CATEGORIES.reduce((acc, cat) => {
 }, {} as Record<RequestCategory, string>);
 
 export default function RequestCard({ request }: RequestCardProps) {
+  const [showShareMenu, setShowShareMenu] = useState(false);
+  const [copied, setCopied] = useState(false);
+  
   const progressPercentage = request.targetAmount
     ? Math.min((request.currentAmount / request.targetAmount) * 100, 100)
     : 0;
@@ -49,6 +55,34 @@ export default function RequestCard({ request }: RequestCardProps) {
   const categoryDisplay = request.category === 'OTHER' && request.customCategory
     ? request.customCategory
     : (categoryLabelsMap[request.category] || request.category);
+
+  const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/requests/${request.id}` : '';
+  const shareText = `Help ${request.user.fullName} with ${request.title}`;
+
+  const handleShare = (platform: string) => {
+    const encodedUrl = encodeURIComponent(shareUrl);
+    const encodedText = encodeURIComponent(shareText);
+    
+    switch (platform) {
+      case 'facebook':
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`, '_blank');
+        break;
+      case 'twitter':
+        window.open(`https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`, '_blank');
+        break;
+      case 'whatsapp':
+        window.open(`https://wa.me/?text=${encodedText}%20${encodedUrl}`, '_blank');
+        break;
+      case 'copy':
+        navigator.clipboard.writeText(shareUrl);
+        setCopied(true);
+        setTimeout(() => {
+          setCopied(false);
+          setShowShareMenu(false);
+        }, 2000);
+        break;
+    }
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-6 border border-gray-200">
@@ -138,6 +172,75 @@ export default function RequestCard({ request }: RequestCardProps) {
         >
           View Details & Donate
         </Link>
+        
+        {/* Share Button */}
+        <div className="relative">
+          <button
+            onClick={() => setShowShareMenu(!showShareMenu)}
+            className="p-2 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-full transition-colors"
+            title="Share this request"
+          >
+            <Share2 className="w-5 h-5" />
+          </button>
+
+          {/* Share Menu */}
+          {showShareMenu && (
+            <div className="absolute bottom-full right-0 mb-2 bg-white rounded-lg shadow-xl border border-gray-200 p-3 z-10 min-w-[200px]">
+              <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-200">
+                <span className="text-sm font-semibold text-gray-900">Share this request</span>
+                <button
+                  onClick={() => setShowShareMenu(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              
+              <div className="space-y-2">
+                <button
+                  onClick={() => handleShare('facebook')}
+                  className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 rounded-md transition-colors"
+                >
+                  <Facebook className="w-4 h-4 text-blue-600" />
+                  <span>Facebook</span>
+                </button>
+                
+                <button
+                  onClick={() => handleShare('twitter')}
+                  className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-sky-50 rounded-md transition-colors"
+                >
+                  <Twitter className="w-4 h-4 text-sky-500" />
+                  <span>X (Twitter)</span>
+                </button>
+                
+                <button
+                  onClick={() => handleShare('whatsapp')}
+                  className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-green-50 rounded-md transition-colors"
+                >
+                  <MessageCircle className="w-4 h-4 text-green-600" />
+                  <span>WhatsApp</span>
+                </button>
+                
+                <button
+                  onClick={() => handleShare('copy')}
+                  className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-4 h-4 text-green-600" />
+                      <span className="text-green-600">Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4 text-gray-600" />
+                      <span>Copy Link</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

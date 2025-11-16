@@ -14,12 +14,21 @@ export async function middleware(request: NextRequest) {
 
   // Redirect authenticated users away from auth pages
   if (isAuthPage && token) {
+    // Redirect admins to admin dashboard, others to regular dashboard
+    if (token.userType === 'ADMIN') {
+      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+    }
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
   // Redirect unauthenticated users to login
   if ((isDashboard || isAdmin) && !token) {
     return NextResponse.redirect(new URL('/auth/login', request.url));
+  }
+
+  // Redirect non-admin users trying to access admin pages
+  if (isAdmin && token && token.userType !== 'ADMIN') {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
   return NextResponse.next();

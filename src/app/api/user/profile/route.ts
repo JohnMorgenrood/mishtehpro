@@ -89,6 +89,14 @@ export async function PUT(request: NextRequest) {
     const facebookUrl = formData.get('facebookUrl') as string | null;
     const twitterUrl = formData.get('twitterUrl') as string | null;
     const instagramUrl = formData.get('instagramUrl') as string | null;
+
+    // Validate required fields
+    if (!location || location.trim() === '') {
+      return NextResponse.json(
+        { error: 'Location is required' },
+        { status: 400 }
+      );
+    }
     
     // Extract files
     const profilePhoto = formData.get('profilePhoto') as File | null;

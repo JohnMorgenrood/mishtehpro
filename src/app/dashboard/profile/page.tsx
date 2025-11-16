@@ -273,17 +273,22 @@ export default function ProfileSettingsPage() {
 
                 <div>
                   <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
-                    Location
+                    Location *
                   </label>
                   <input
                     id="location"
                     type="text"
+                    required
                     ref={locationInputRef}
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                     placeholder="Start typing your address..."
+                    autoComplete="off"
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Required - Start typing to search for your address
+                  </p>
                 </div>
 
                 <div>

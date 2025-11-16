@@ -17,6 +17,11 @@ export async function POST(request: NextRequest) {
     const phone = formData.get('phone') as string | null;
     const location = formData.get('location') as string | null;
     
+    // Extract sponsor-specific fields
+    const sponsorType = formData.get('sponsorType') as string | null;
+    const companyName = formData.get('companyName') as string | null;
+    const industry = formData.get('industry') as string | null;
+    
     // FICA fields for REQUESTER users
     const idNumber = formData.get('idNumber') as string | null;
     const dateOfBirth = formData.get('dateOfBirth') as string | null;
@@ -26,6 +31,14 @@ export async function POST(request: NextRequest) {
     if (!fullName || !email || !password || !userType) {
       return NextResponse.json(
         { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    // Validate location is required
+    if (!location || location.trim() === '') {
+      return NextResponse.json(
+        { error: 'Location is required' },
         { status: 400 }
       );
     }
@@ -71,12 +84,17 @@ export async function POST(request: NextRequest) {
         userType: userType as any,
         phone,
         location,
+        sponsorType: sponsorType as any,
+        companyName,
+        industry,
       },
       select: {
         id: true,
         email: true,
         fullName: true,
         userType: true,
+        sponsorType: true,
+        companyName: true,
       },
     });
 

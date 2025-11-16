@@ -36,6 +36,9 @@ model User {
   facebookUrl      String?
   instagramUrl     String?
   twitterUrl       String?
+  sponsorType      SponsorType?
+  companyName      String?
+  industry         String?
   documents        Document[]
   donations        Donation[]
   preferences      DonorPreference?
@@ -230,6 +233,11 @@ enum UserType {
   REQUESTER
   SPONSOR
   ADMIN
+}
+
+enum SponsorType {
+  BUSINESS
+  INDIVIDUAL
 }
 
 enum RequestCategory {

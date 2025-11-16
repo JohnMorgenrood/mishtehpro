@@ -28,6 +28,9 @@ export default function RegisterPage() {
     countryCode: '+27',
     phone: '',
     location: '',
+    sponsorType: '' as '' | 'BUSINESS' | 'INDIVIDUAL',
+    companyName: '',
+    industry: '',
   });
   
   const [error, setError] = useState('');
@@ -135,6 +138,24 @@ export default function RegisterPage() {
       return;
     }
 
+    // Validate sponsor-specific fields
+    if (formData.userType === 'SPONSOR') {
+      if (!formData.sponsorType) {
+        setError('Please select whether you are a business or individual');
+        return;
+      }
+      if (formData.sponsorType === 'BUSINESS') {
+        if (!formData.companyName.trim()) {
+          setError('Company name is required for business sponsors');
+          return;
+        }
+        if (!formData.industry) {
+          setError('Industry is required for business sponsors');
+          return;
+        }
+      }
+    }
+
     setIsLoading(true);
 
     try {
@@ -146,6 +167,15 @@ export default function RegisterPage() {
       submitData.append('userType', formData.userType);
       submitData.append('phone', `${formData.countryCode}${formData.phone}`);
       submitData.append('location', formData.location);
+
+      // Add sponsor-specific data
+      if (formData.userType === 'SPONSOR') {
+        submitData.append('sponsorType', formData.sponsorType);
+        if (formData.sponsorType === 'BUSINESS') {
+          submitData.append('companyName', formData.companyName);
+          submitData.append('industry', formData.industry);
+        }
+      }
 
       const response = await fetch('/api/auth/register', {
         method: 'POST',
@@ -237,7 +267,7 @@ export default function RegisterPage() {
                       : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
                   }`}
                 >
-                  Sponsor
+                  Sponsor MISHTEH
                 </button>
               </div>
             </div>
@@ -302,12 +332,13 @@ export default function RegisterPage() {
 
             <div>
               <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
-                Location (Optional)
+                Location *
               </label>
               <input
                 ref={locationInputRef}
                 id="location"
                 type="text"
+                required
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
@@ -315,9 +346,102 @@ export default function RegisterPage() {
                 autoComplete="off"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Start typing to search for your address
+                Required - Start typing to search for your address
               </p>
             </div>
+
+            {/* Sponsor-specific questions */}
+            {formData.userType === 'SPONSOR' && (
+              <div className="space-y-4 p-4 bg-primary-50 border border-primary-200 rounded-lg">
+                <h3 className="text-sm font-semibold text-primary-900">Tell us about your sponsorship</h3>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Are you a business or an individual? *
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, sponsorType: 'BUSINESS' })}
+                      className={`px-4 py-3 border-2 rounded-md text-sm font-medium transition-colors ${
+                        formData.sponsorType === 'BUSINESS'
+                          ? 'border-primary-600 bg-white text-primary-700 shadow-sm'
+                          : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      🏢 Business/Organization
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, sponsorType: 'INDIVIDUAL', companyName: '', industry: '' })}
+                      className={`px-4 py-3 border-2 rounded-md text-sm font-medium transition-colors ${
+                        formData.sponsorType === 'INDIVIDUAL'
+                          ? 'border-primary-600 bg-white text-primary-700 shadow-sm'
+                          : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      👤 Individual
+                    </button>
+                  </div>
+                </div>
+
+                {formData.sponsorType === 'BUSINESS' && (
+                  <>
+                    <div>
+                      <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-1">
+                        Company/Organization Name *
+                      </label>
+                      <input
+                        id="companyName"
+                        type="text"
+                        required
+                        value={formData.companyName}
+                        onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                        placeholder="Your company name"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="industry" className="block text-sm font-medium text-gray-700 mb-1">
+                        Industry/Sector *
+                      </label>
+                      <select
+                        id="industry"
+                        required
+                        value={formData.industry}
+                        onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
+                      >
+                        <option value="">Select your industry</option>
+                        <option value="TECH">Technology & IT</option>
+                        <option value="FINANCE">Finance & Banking</option>
+                        <option value="HEALTHCARE">Healthcare & Medical</option>
+                        <option value="RETAIL">Retail & E-commerce</option>
+                        <option value="MANUFACTURING">Manufacturing</option>
+                        <option value="HOSPITALITY">Hospitality & Tourism</option>
+                        <option value="EDUCATION">Education & Training</option>
+                        <option value="REAL_ESTATE">Real Estate & Property</option>
+                        <option value="AGRICULTURE">Agriculture & Farming</option>
+                        <option value="MEDIA">Media & Entertainment</option>
+                        <option value="NONPROFIT">Non-Profit & NGO</option>
+                        <option value="PROFESSIONAL_SERVICES">Professional Services</option>
+                        <option value="CONSTRUCTION">Construction & Engineering</option>
+                        <option value="OTHER">Other</option>
+                      </select>
+                    </div>
+                  </>
+                )}
+
+                {formData.sponsorType === 'INDIVIDUAL' && (
+                  <div className="p-3 bg-white border border-primary-200 rounded-md">
+                    <p className="text-sm text-gray-700">
+                      ✨ Thank you for choosing to sponsor MISHTEH as an individual! Your contribution will help us empower communities and create lasting change.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* FICA Documents Section - Only for REQUESTER users */}
             <div>

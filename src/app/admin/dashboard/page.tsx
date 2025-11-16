@@ -103,7 +103,7 @@ export default function AdminDashboardPage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-              <p className="text-gray-600">Welcome back, {session?.user?.fullName}</p>
+              <p className="text-gray-600">Welcome back, {session?.user?.name}</p>
             </div>
           </div>
         </div>

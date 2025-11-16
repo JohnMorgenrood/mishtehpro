@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, User } from 'lucide-react';
 
 interface Request {
   id: string;
@@ -24,6 +24,7 @@ interface Request {
     email: string;
     phone?: string;
     location?: string;
+    image?: string;
   };
 }
 
@@ -187,15 +188,27 @@ export default function AdminRequestReview({ params }: { params: { id: string } 
             {/* Requester Information */}
             <div className="border-t pt-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Requester Information</h3>
+              
+              {/* Profile Image/Avatar */}
+              <div className="mb-4 flex items-center space-x-4">
+                {request.user.image ? (
+                  <img
+                    src={request.user.image}
+                    alt={request.user.fullName}
+                    className="h-20 w-20 rounded-full object-cover border-4 border-primary-200 shadow-md"
+                  />
+                ) : (
+                  <div className="h-20 w-20 rounded-full bg-primary-100 flex items-center justify-center border-4 border-primary-200 shadow-md">
+                    <User className="h-10 w-10 text-primary-600" />
+                  </div>
+                )}
+                <div>
+                  <p className="text-xl font-semibold text-gray-900">{request.user.fullName}</p>
+                  <p className="text-sm text-gray-600">{request.user.email}</p>
+                </div>
+              </div>
+              
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-600">Full Name</p>
-                  <p className="font-medium">{request.user.fullName}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Email</p>
-                  <p className="font-medium">{request.user.email}</p>
-                </div>
                 {request.user.phone && (
                   <div>
                     <p className="text-sm text-gray-600">Phone</p>

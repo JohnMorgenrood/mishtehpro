@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Search, Filter, CheckCircle, XCircle, Clock, AlertTriangle } from 'lucide-react';
+import { Search, Filter, CheckCircle, XCircle, Clock, AlertTriangle, User } from 'lucide-react';
 import { CurrencyDisplay } from '@/components/CurrencyDisplay';
 
 interface Request {
@@ -23,6 +23,7 @@ interface Request {
     fullName: string;
     email: string;
     ficaVerified: boolean;
+    image?: string;
   };
 }
 
@@ -280,15 +281,32 @@ export default function AdminRequestsPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm">
-                        <p className="font-medium text-gray-900">{request.user.fullName}</p>
-                        <p className="text-gray-500 text-xs">{request.user.email}</p>
-                        {request.user.ficaVerified && (
-                          <span className="inline-flex items-center gap-1 mt-1 text-xs text-green-600">
-                            <CheckCircle className="w-3 h-3" />
-                            FICA Verified
-                          </span>
-                        )}
+                      <div className="flex items-center space-x-3">
+                        {/* Profile Image/Avatar */}
+                        <div className="flex-shrink-0">
+                          {request.user.image ? (
+                            <img
+                              src={request.user.image}
+                              alt={request.user.fullName}
+                              className="h-10 w-10 rounded-full object-cover border-2 border-gray-200"
+                            />
+                          ) : (
+                            <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center border-2 border-primary-200">
+                              <User className="h-5 w-5 text-primary-600" />
+                            </div>
+                          )}
+                        </div>
+                        {/* User Details */}
+                        <div className="text-sm">
+                          <p className="font-medium text-gray-900">{request.user.fullName}</p>
+                          <p className="text-gray-500 text-xs">{request.user.email}</p>
+                          {request.user.ficaVerified && (
+                            <span className="inline-flex items-center gap-1 mt-1 text-xs text-green-600">
+                              <CheckCircle className="w-3 h-3" />
+                              FICA Verified
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">

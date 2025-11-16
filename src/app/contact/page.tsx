@@ -120,11 +120,11 @@ export default function ContactPage() {
             <div className="bg-primary-50 p-6 rounded-lg border border-primary-200">
               <h3 className="font-semibold text-primary-900 mb-2">Office Hours</h3>
               <p className="text-sm text-primary-800">
-                Monday - Friday: 9:00 AM - 6:00 PM PST<br />
-                Saturday - Sunday: Closed
+                Available 24/7<br />
+                We're here for you anytime
               </p>
               <p className="text-sm text-primary-700 mt-3">
-                We typically respond within 24 hours during business days.
+                We typically respond within 24 hours.
               </p>
             </div>
           </div>

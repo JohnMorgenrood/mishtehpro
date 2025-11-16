@@ -62,54 +62,6 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Handle file uploads for REQUESTER users
-    let profilePhotoUrl = null;
-    let idDocumentUrl = null;
-    let selfieUrl = null;
-
-    if (userType === 'REQUESTER') {
-      const profilePhoto = formData.get('profilePhoto') as File | null;
-      const idDocument = formData.get('idDocument') as File | null;
-      const selfieWithId = formData.get('selfieWithId') as File | null;
-
-      // Validate required FICA documents
-      if (!profilePhoto || !idDocument || !selfieWithId) {
-        return NextResponse.json(
-          { error: 'Profile photo, ID document, and selfie with ID are required for help seekers' },
-          { status: 400 }
-        );
-      }
-
-      if (!idNumber || !dateOfBirth) {
-        return NextResponse.json(
-          { error: 'ID number and date of birth are required for help seekers' },
-          { status: 400 }
-        );
-      }
-
-      // Create upload directory
-      const uploadDir = join(process.cwd(), 'public', 'uploads', 'fica');
-      if (!existsSync(uploadDir)) {
-        await mkdir(uploadDir, { recursive: true });
-      }
-
-      // Helper function to save file
-      const saveFile = async (file: File, prefix: string): Promise<string> => {
-        const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-        const timestamp = Date.now();
-        const filename = `${prefix}_${timestamp}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-        const filepath = join(uploadDir, filename);
-        await writeFile(filepath, buffer);
-        return `/uploads/fica/${filename}`;
-      };
-
-      // Save all files
-      profilePhotoUrl = await saveFile(profilePhoto, 'profile');
-      idDocumentUrl = await saveFile(idDocument, 'id');
-      selfieUrl = await saveFile(selfieWithId, 'selfie');
-    }
-
     // Create new user
     const user = await prisma.user.create({
       data: {
@@ -119,12 +71,6 @@ export async function POST(request: NextRequest) {
         userType: userType as any,
         phone,
         location,
-        image: profilePhotoUrl,
-        idDocumentUrl,
-        idDocumentType,
-        idNumber,
-        selfieUrl,
-        dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
       },
       select: {
         id: true,
@@ -134,8 +80,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // If user is a donor, create default preferences
-    if (userType === 'DONOR') {
+    // If user is a donor or sponsor, create default preferences
+    if (userType === 'DONOR' || userType === 'SPONSOR') {
       await prisma.donorPreference.create({
         data: {
           userId: user.id,

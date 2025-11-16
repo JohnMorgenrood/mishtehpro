@@ -228,6 +228,7 @@ model ContactMessage {
 enum UserType {
   DONOR
   REQUESTER
+  SPONSOR
   ADMIN
 }
 

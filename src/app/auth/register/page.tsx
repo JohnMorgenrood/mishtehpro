@@ -6,7 +6,6 @@ import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import { UserPlus, Eye, EyeOff } from 'lucide-react';
 import { COUNTRY_CODES } from '@/lib/countries';
-import FicaUpload from '@/components/FicaUpload';
 
 // Declare Google Maps types
 declare global {
@@ -25,24 +24,10 @@ export default function RegisterPage() {
     email: '',
     password: '',
     confirmPassword: '',
-    userType: 'DONOR' as 'DONOR' | 'REQUESTER',
+    userType: 'DONOR' as 'DONOR' | 'REQUESTER' | 'SPONSOR',
     countryCode: '+27',
     phone: '',
     location: '',
-    idNumber: '',
-    dateOfBirth: '',
-    idDocumentType: 'national_id' as 'national_id' | 'passport' | 'drivers_license',
-  });
-  
-  // FICA documents for REQUESTER users
-  const [ficaDocuments, setFicaDocuments] = useState<{
-    profilePhoto: File | null;
-    idDocument: File | null;
-    selfieWithId: File | null;
-  }>({
-    profilePhoto: null,
-    idDocument: null,
-    selfieWithId: null,
   });
   
   const [error, setError] = useState('');
@@ -144,28 +129,10 @@ export default function RegisterPage() {
       return;
     }
 
-    // Validate FICA documents for REQUESTER users
-    if (formData.userType === 'REQUESTER') {
-      if (!ficaDocuments.profilePhoto) {
-        setError('Please upload a profile photo');
-        return;
-      }
-      if (!ficaDocuments.idDocument) {
-        setError('Please upload your ID document');
-        return;
-      }
-      if (!ficaDocuments.selfieWithId) {
-        setError('Please upload a selfie holding your ID');
-        return;
-      }
-      if (!formData.idNumber) {
-        setError('Please enter your ID number');
-        return;
-      }
-      if (!formData.dateOfBirth) {
-        setError('Please enter your date of birth');
-        return;
-      }
+    // Validate location is required
+    if (!formData.location) {
+      setError('Location is required');
+      return;
     }
 
     setIsLoading(true);
@@ -178,27 +145,7 @@ export default function RegisterPage() {
       submitData.append('password', formData.password);
       submitData.append('userType', formData.userType);
       submitData.append('phone', `${formData.countryCode}${formData.phone}`);
-      
-      if (formData.location) {
-        submitData.append('location', formData.location);
-      }
-
-      // Add FICA data for REQUESTER users
-      if (formData.userType === 'REQUESTER') {
-        submitData.append('idNumber', formData.idNumber);
-        submitData.append('dateOfBirth', formData.dateOfBirth);
-        submitData.append('idDocumentType', formData.idDocumentType);
-        
-        if (ficaDocuments.profilePhoto) {
-          submitData.append('profilePhoto', ficaDocuments.profilePhoto);
-        }
-        if (ficaDocuments.idDocument) {
-          submitData.append('idDocument', ficaDocuments.idDocument);
-        }
-        if (ficaDocuments.selfieWithId) {
-          submitData.append('selfieWithId', ficaDocuments.selfieWithId);
-        }
-      }
+      submitData.append('location', formData.location);
 
       const response = await fetch('/api/auth/register', {
         method: 'POST',
@@ -211,9 +158,18 @@ export default function RegisterPage() {
         throw new Error(data.error || 'Registration failed');
       }
 
-      // Success - redirect to login
-      alert('Registration successful! Please log in.');
-      router.push('/auth/login');
+      // Success - sign in and redirect to profile page
+      const signInResult = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      });
+
+      if (signInResult?.ok) {
+        router.push('/dashboard/profile');
+      } else {
+        router.push('/auth/login');
+      }
     } catch (err: any) {
       setError(err.message || 'An error occurred. Please try again.');
     } finally {
@@ -249,7 +205,7 @@ export default function RegisterPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 I want to:
               </label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, userType: 'DONOR' })}
@@ -259,7 +215,7 @@ export default function RegisterPage() {
                       : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
                   }`}
                 >
-                  Donate & Help
+                  Donate
                 </button>
                 <button
                   type="button"
@@ -271,6 +227,17 @@ export default function RegisterPage() {
                   }`}
                 >
                   Request Help
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, userType: 'SPONSOR' })}
+                  className={`px-4 py-3 border-2 rounded-md text-sm font-medium transition-colors ${
+                    formData.userType === 'SPONSOR'
+                      ? 'border-primary-600 bg-primary-50 text-primary-700'
+                      : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  Sponsor
                 </button>
               </div>
             </div>
@@ -353,93 +320,6 @@ export default function RegisterPage() {
             </div>
 
             {/* FICA Documents Section - Only for REQUESTER users */}
-            {formData.userType === 'REQUESTER' && (
-              <>
-                <div className="pt-4 border-t border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    Identity Verification (FICA)
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    To comply with regulations and build trust, we need to verify your identity. Please upload the following documents:
-                  </p>
-                </div>
-
-                <FicaUpload
-                  label="Profile Photo"
-                  description="A clear photo of yourself for your profile"
-                  icon="image"
-                  required
-                  value={ficaDocuments.profilePhoto}
-                  onFileSelect={(file) => setFicaDocuments({ ...ficaDocuments, profilePhoto: file })}
-                  acceptedTypes={['image/jpeg', 'image/png', 'image/jpg']}
-                />
-
-                <div>
-                  <label htmlFor="idDocumentType" className="block text-sm font-medium text-gray-700 mb-1">
-                    ID Document Type *
-                  </label>
-                  <select
-                    id="idDocumentType"
-                    value={formData.idDocumentType}
-                    onChange={(e) => setFormData({ ...formData, idDocumentType: e.target.value as any })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
-                  >
-                    <option value="national_id">National ID</option>
-                    <option value="passport">Passport</option>
-                    <option value="drivers_license">Driver's License</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="idNumber" className="block text-sm font-medium text-gray-700 mb-1">
-                    ID Number *
-                  </label>
-                  <input
-                    id="idNumber"
-                    type="text"
-                    required={formData.userType === 'REQUESTER'}
-                    value={formData.idNumber}
-                    onChange={(e) => setFormData({ ...formData, idNumber: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
-                    placeholder="Enter your ID number"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700 mb-1">
-                    Date of Birth *
-                  </label>
-                  <input
-                    id="dateOfBirth"
-                    type="date"
-                    required={formData.userType === 'REQUESTER'}
-                    value={formData.dateOfBirth}
-                    onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
-                  />
-                </div>
-
-                <FicaUpload
-                  label="ID Document"
-                  description="Upload a clear photo of your ID, Passport, or Driver's License"
-                  icon="document"
-                  required
-                  value={ficaDocuments.idDocument}
-                  onFileSelect={(file) => setFicaDocuments({ ...ficaDocuments, idDocument: file })}
-                />
-
-                <FicaUpload
-                  label="Selfie with ID"
-                  description="Take or upload a photo of yourself holding your ID document next to your face"
-                  icon="camera"
-                  required
-                  value={ficaDocuments.selfieWithId}
-                  onFileSelect={(file) => setFicaDocuments({ ...ficaDocuments, selfieWithId: file })}
-                  acceptedTypes={['image/jpeg', 'image/png', 'image/jpg']}
-                />
-              </>
-            )}
-
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                 Password *
